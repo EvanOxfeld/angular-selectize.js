@@ -70,7 +70,7 @@ angular.module('selectize', [])
                 value = valueFn(optionContext);
               }
 
-              var index = _.indexOf(model, value);
+              var index = model.indexOf(value);
               if (index >= 0) {
                 model.splice(index);
                 scope.$evalAsync(function() {
