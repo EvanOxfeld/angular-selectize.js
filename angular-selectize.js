@@ -72,7 +72,7 @@ angular.module('selectize', [])
 
               var index = model.indexOf(value);
               if (index >= 0) {
-                model.splice(index);
+                model.splice(index, 1);
                 scope.$evalAsync(function() {
                   ngModelCtrl.$setViewValue(model);
                 });

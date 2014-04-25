@@ -150,7 +150,6 @@ describe('selectize directive', function() {
 						scope.options = stringOptions;
 						scope.selection = ['foo'];
 						createDirective('<select multiple ng-model="selection" ng-options="option for option in options" selectize="{ create:\'true\' }"></select>');
-
 					});
 
 					describe('when created', function() {
@@ -203,9 +202,12 @@ describe('selectize directive', function() {
 
 					describe('when a selected option is unselected', function() {
 						it('should update the model', function() {
-							expect(scope.selection).toEqual(['foo']);
+							selectize.addItem(1);
+							selectize.addItem(2);
+							expect(scope.selection).toEqual(['foo','bar','baz']);
+
 							selectize.removeItem(0);
-							expect(scope.selection).toEqual([]);
+							expect(scope.selection).toEqual(['bar','baz']);
 						});
 					});
 
@@ -280,9 +282,12 @@ describe('selectize directive', function() {
 
 					describe('when a selected option is unselected', function() {
 						it('should update the model', function() {
-							expect(scope.selection).toEqual(['guid1']);
+							selectize.addItem(1);
+							selectize.addItem(2);
+							expect(scope.selection).toEqual(['guid1','guid2','guid3']);
+
 							selectize.removeItem(0);
-							expect(scope.selection).toEqual([]);
+							expect(scope.selection).toEqual(['guid2','guid3']);
 						});
 					});
 
