@@ -1,0 +1,41 @@
+{
+  "name": "angular-selectize.js",
+  "version": "0.1.0",
+  "description": "Angular Selectize directive for a hybrid textbox + <select> box. Supports ngOptions and two-way bindings.",
+  "main": "angular-selectize.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "karma start test/karma.conf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EvanOxfeld/angular-selectize.js.git"
+  },
+  "keywords": [
+    "angular",
+    "selectize",
+    "angular-selectize",
+    "ng-selectize",
+    "select",
+    "input",
+    "tagging",
+    "tag",
+    "combo",
+    "box",
+    "combobox",
+    "selectbox"
+  ],
+  "author": "Evan Oxfeld <eoxfeld@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EvanOxfeld/angular-selectize.js/issues"
+  },
+  "homepage": "https://github.com/EvanOxfeld/angular-selectize.js",
+  "devDependencies": {
+    "karma": "^0.12.10",
+    "karma-jasmine": "^0.1.5",
+    "karma-phantomjs-launcher": "^0.1.4"
+  }
+}
