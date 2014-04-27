@@ -25,30 +25,33 @@ angular.module('selectize', [])
   var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
 
   return {
+    scope: {
+      multiple: '@',
+      opts: '@selectize'
+    },
     require: '?ngModel',
     link: function(scope, element, attrs, ngModelCtrl) {
-      var selectizeOptions = scope.$eval(attrs.selectize) || {};
-      var isMultiselect = angular.isDefined(attrs.multiple);
+      var opts = scope.$parent.$eval(scope.opts) || {};
       var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP);
       var valueName = match[4] || match[6];
       var optionsProperty = match[7];
       var valueFn = $parse(match[2] ? match[1] : valueName);
       var selectize;
 
-      scope.$watchCollection(optionsProperty, refreshSelectize);
+      scope.$parent.$watchCollection(optionsProperty, refreshSelectize);
 
       function refreshSelectize(newOptions, oldOptions) {
         if (selectize) {
           selectize.destroy();
         }
         scope.$evalAsync(function() {
-          $(element).selectize(selectizeOptions);
+          $(element).selectize(opts);
           selectize = $(element)[0].selectize;
-          if (isMultiselect) {
+          if (scope.multiple) {
             selectize.on('item_add', function(value, $item) {
               var model = ngModelCtrl.$viewValue;
 
-              var optionsModel = scope[optionsProperty];
+              var optionsModel = scope.$parent[optionsProperty];
               if (optionsModel[value]) {
                 var optionContext = {};
                 optionContext[valueName] = optionsModel[value];
@@ -63,7 +66,7 @@ angular.module('selectize', [])
             selectize.on('item_remove', function(value) {
               var model = ngModelCtrl.$viewValue;
 
-              var optionsModel = scope[optionsProperty];
+              var optionsModel = scope.$parent[optionsProperty];
               if (optionsModel[value]) {
                 var optionContext = {};
                 optionContext[valueName] = optionsModel[value];
