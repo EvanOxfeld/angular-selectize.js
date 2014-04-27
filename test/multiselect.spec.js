@@ -106,7 +106,41 @@ describe('<select multiple selectize>', function() {
           });
         });
 
-        //describe('when the model is updated', function() {});
+        describe('when the model is updated', function() {
+          beforeEach(function() {
+            var domOptions = selectElement.find('option');
+            assert.strictEqual(domOptions.length, 1);
+            assert.ok(domOptions.attr('selected'));
+            assert.equal(domOptions.attr('value'), 0);
+          });
+
+          it('should clear the selection when the model is empty', function() {
+            scope.selection = [];
+            scope.$apply();
+            assert.strictEqual(selectElement.find('option').length, 0);
+          });
+
+          it('should update the selection when the model contains a single item', function() {
+            scope.selection = ['bar'];
+            scope.$apply();
+
+            var domOptions = selectElement.find('option');
+            assert.strictEqual(domOptions.length, 1);
+            assert.ok(domOptions.attr('selected'));
+            assert.equal(domOptions.attr('value'), 1);
+          });
+
+          it('should update the selection when the model contains two items', function() {
+            scope.selection = ['bar', 'baz'];
+            scope.$apply();
+
+            var domOptions = selectElement.find('option');
+            assert.strictEqual(domOptions.length, 2);
+            assert.ok(domOptions.attr('selected'));
+            assert.ok(selectElement.find('option[value=1]'));
+            assert.ok(selectElement.find('option[value=2]'));
+          });
+        });
 
         describe('when the options are updated', function() {
           it('should have the correct number of unselected options in the dropdown menu', function() {
@@ -186,7 +220,42 @@ describe('<select multiple selectize>', function() {
           });
         });
 
-        //describe('when the model is updated', function() {});
+        describe('when the model is updated', function() {
+          beforeEach(function() {
+            var domOptions = selectElement.find('option');
+            var selectedValue = scope.options[parseInt(domOptions.attr('value'), 10)].value;
+            assert.strictEqual(domOptions.length, 1);
+            assert.ok(domOptions.attr('selected'));
+            assert.equal(selectedValue, scope.selection);
+          });
+
+          it('should clear the selection when the model is empty', function() {
+            scope.selection = [];
+            scope.$apply();
+            assert.strictEqual(selectElement.find('option').length, 0);
+          });
+
+          it('should update the selection when the model contains a single item', function() {
+            scope.selection = ['guid2'];
+            scope.$apply();
+
+            var domOptions = selectElement.find('option');
+            assert.strictEqual(domOptions.length, 1);
+            assert.ok(domOptions.attr('selected'));
+            assert.equal(domOptions.attr('value'), 1);
+          });
+
+          it('should update the selection when the model contains two items', function() {
+            scope.selection = ['guid2', 'guid3'];
+            scope.$apply();
+
+            var domOptions = selectElement.find('option');
+            assert.strictEqual(domOptions.length, 2);
+            assert.ok(domOptions.attr('selected'));
+            assert.ok(selectElement.find('option[value=1]'));
+            assert.ok(selectElement.find('option[value=2]'));
+          });
+        });
 
         describe('when the options are updated', function() {
           it('should have the same number of options in the dropdown menu as scope.options', function() {

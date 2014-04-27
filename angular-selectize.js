@@ -38,6 +38,23 @@ angular.module('selectize', [])
       var valueFn = $parse(match[2] ? match[1] : valueName);
       var selectize;
 
+      scope.$parent.$watch(function() {
+        return ngModelCtrl.$modelValue;
+      }, function(newValues, oldValues) {
+        if (selectize && !angular.equals(newValues, oldValues) && !modelMatchesView()) {
+          refreshSelectize();
+        }
+      });
+
+      function modelMatchesView() {
+        var model = ngModelCtrl.$modelValue;
+        model = model && !angular.isArray(model) ? [model] : model || [];
+        var view = selectize.items.map(function(item) {
+          return getOptionValue(scope.$parent[optionsProperty][item]);
+        });
+        return angular.equals(model, view);
+      }
+
       scope.$parent.$watchCollection(optionsProperty, refreshSelectize);
 
       function refreshSelectize(newOptions, oldOptions) {
@@ -50,13 +67,8 @@ angular.module('selectize', [])
           if (scope.multiple) {
             selectize.on('item_add', function(value, $item) {
               var model = ngModelCtrl.$viewValue;
-
-              var optionsModel = scope.$parent[optionsProperty];
-              if (optionsModel[value]) {
-                var optionContext = {};
-                optionContext[valueName] = optionsModel[value];
-                value = valueFn(optionContext);
-              }
+              var option = scope.$parent[optionsProperty][value];
+              value = option ? getOptionValue(option) : value;
 
               model.push(value);
               scope.$evalAsync(function() {
@@ -65,13 +77,8 @@ angular.module('selectize', [])
             });
             selectize.on('item_remove', function(value) {
               var model = ngModelCtrl.$viewValue;
-
-              var optionsModel = scope.$parent[optionsProperty];
-              if (optionsModel[value]) {
-                var optionContext = {};
-                optionContext[valueName] = optionsModel[value];
-                value = valueFn(optionContext);
-              }
+              var option = scope.$parent[optionsProperty][value];
+              value = option ? getOptionValue(option) : value;
 
               var index = model.indexOf(value);
               if (index >= 0) {
@@ -83,6 +90,12 @@ angular.module('selectize', [])
             });
           }
         });
+      }
+
+      function getOptionValue(option) {
+        var optionContext = {};
+        optionContext[valueName] = option;
+        return valueFn(optionContext);
       }
     }
   };

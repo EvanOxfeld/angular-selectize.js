@@ -72,7 +72,22 @@ describe('<select selectize>', function() {
       });
     });
 
-    //describe('when the model is updated', function() {});
+    describe('when the model is updated', function() {
+      it('should update the selection', function() {
+          var domOptions = selectElement.find('option');
+          assert.strictEqual(domOptions.length, 1);
+          assert.ok(domOptions.attr('selected'));
+          assert.equal(domOptions.attr('value'), 0);
+
+          scope.selection = 'bar';
+          scope.$apply();
+
+          domOptions = selectElement.find('option');
+          assert.strictEqual(domOptions.length, 1);
+          assert.ok(domOptions.attr('selected'));
+          assert.equal(domOptions.attr('value'), 1);
+      });
+    });
 
     describe('when the options are updated', function() {
       it('should have the same number of options in the dropdown menu as scope.options', function() {
@@ -121,7 +136,24 @@ describe('<select selectize>', function() {
       });
     });
 
-    //describe('when the model is updated', function() {});
+    describe('when the model is updated', function() {
+      it('should update the selection', function() {
+          var domOptions = selectElement.find('option');
+          var selectedValue = scope.options[parseInt(domOptions.attr('value'), 10)].value;
+          assert.strictEqual(domOptions.length, 1);
+          assert.ok(domOptions.attr('selected'));
+          assert.equal(selectedValue, scope.selection);
+
+          scope.selection = 'guid3';
+          scope.$apply();
+
+          domOptions = selectElement.find('option');
+          selectedValue = scope.options[parseInt(domOptions.attr('value'), 10)].value;
+          assert.strictEqual(domOptions.length, 1);
+          assert.ok(domOptions.attr('selected'));
+          assert.equal(selectedValue, scope.selection);
+      });
+    });
 
     describe('when the options are updated', function() {
       it('should have the same number of options in the dropdown menu as scope.options', function() {
