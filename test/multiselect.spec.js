@@ -37,6 +37,24 @@ describe('<select multiple selectize>', function() {
     $(element).mousedown().click().mouseup();
   }
 
+  function testSelectedOptions(values) {
+    values = angular.isArray(values) ? values : [values];
+    var domValues = selectElement
+                      .find('option[selected]')
+                      .map(function() {
+                        return parseInt($(this).attr('value'), 10);
+                      })
+                      .toArray()
+                      .reduce(function(arr, v) {
+                        if (arr.indexOf(v) < 0) arr.push(v);
+                        return arr;
+                      }, []);
+    assert.strictEqual(domValues.length, values.length);
+    assert.ok(domValues.every(function(v) {
+      return values.indexOf(v) >= 0;
+    }));
+  }
+
   describe('with create mode enabled', function() {
     // describe('with an empty ng-model', function() {});
     describe('with a single value in ng-model', function() {
@@ -57,10 +75,7 @@ describe('<select multiple selectize>', function() {
           });
 
           it('should default to the ng-model value', function() {
-            var domOptions = selectElement.find('option');
-            assert.strictEqual(domOptions.length, 1);
-            assert.ok(domOptions.attr('selected'));
-            assert.equal(domOptions.attr('value'), 0);
+            testSelectedOptions(0);
           });
         });
 
@@ -108,10 +123,7 @@ describe('<select multiple selectize>', function() {
 
         describe('when the model is updated', function() {
           beforeEach(function() {
-            var domOptions = selectElement.find('option');
-            assert.strictEqual(domOptions.length, 1);
-            assert.ok(domOptions.attr('selected'));
-            assert.equal(domOptions.attr('value'), 0);
+            testSelectedOptions(0);
           });
 
           it('should clear the selection when the model is empty', function() {
@@ -123,22 +135,13 @@ describe('<select multiple selectize>', function() {
           it('should update the selection when the model contains a single item', function() {
             scope.selection = ['bar'];
             scope.$apply();
-
-            var domOptions = selectElement.find('option');
-            assert.strictEqual(domOptions.length, 1);
-            assert.ok(domOptions.attr('selected'));
-            assert.equal(domOptions.attr('value'), 1);
+            testSelectedOptions(1);
           });
 
           it('should update the selection when the model contains two items', function() {
             scope.selection = ['bar', 'baz'];
             scope.$apply();
-
-            var domOptions = selectElement.find('option');
-            assert.strictEqual(domOptions.length, 2);
-            assert.ok(domOptions.attr('selected'));
-            assert.ok(selectElement.find('option[value=1]'));
-            assert.ok(selectElement.find('option[value=2]'));
+            testSelectedOptions([1,2]);
           });
         });
 
@@ -171,11 +174,7 @@ describe('<select multiple selectize>', function() {
           });
 
           it('should default to the ng-model value', function() {
-            var domOptions = selectElement.find('option');
-            var selectedValue = scope.options[parseInt(domOptions.attr('value'), 10)].value;
-            assert.strictEqual(domOptions.length, 1);
-            assert.ok(domOptions.attr('selected'));
-            assert.strictEqual(selectedValue, scope.selection[0]);
+            testSelectedOptions(0);
           });
         });
 
@@ -222,11 +221,7 @@ describe('<select multiple selectize>', function() {
 
         describe('when the model is updated', function() {
           beforeEach(function() {
-            var domOptions = selectElement.find('option');
-            var selectedValue = scope.options[parseInt(domOptions.attr('value'), 10)].value;
-            assert.strictEqual(domOptions.length, 1);
-            assert.ok(domOptions.attr('selected'));
-            assert.equal(selectedValue, scope.selection);
+            testSelectedOptions(0);
           });
 
           it('should clear the selection when the model is empty', function() {
@@ -238,22 +233,13 @@ describe('<select multiple selectize>', function() {
           it('should update the selection when the model contains a single item', function() {
             scope.selection = ['guid2'];
             scope.$apply();
-
-            var domOptions = selectElement.find('option');
-            assert.strictEqual(domOptions.length, 1);
-            assert.ok(domOptions.attr('selected'));
-            assert.equal(domOptions.attr('value'), 1);
+            testSelectedOptions(1);
           });
 
           it('should update the selection when the model contains two items', function() {
             scope.selection = ['guid2', 'guid3'];
             scope.$apply();
-
-            var domOptions = selectElement.find('option');
-            assert.strictEqual(domOptions.length, 2);
-            assert.ok(domOptions.attr('selected'));
-            assert.ok(selectElement.find('option[value=1]'));
-            assert.ok(selectElement.find('option[value=2]'));
+            testSelectedOptions([1,2]);
           });
         });
 
