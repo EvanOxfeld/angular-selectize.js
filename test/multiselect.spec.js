@@ -60,7 +60,7 @@ describe('<select multiple selectize>', function() {
     describe('with a single value in ng-model', function() {
       describe('with a string array of options', function() {
         beforeEach(function() {
-          scope.options = stringOptions;
+          scope.options = angular.copy(stringOptions);
           scope.selection = ['foo'];
           createDirective('<select multiple ng-model="selection" ng-options="option for option in options" selectize="{ create:\'true\' }"></select>');
         });
@@ -159,7 +159,7 @@ describe('<select multiple selectize>', function() {
 
       describe('with an object array of options', function() {
         beforeEach(function() {
-          scope.options = objectOptions;
+          scope.options = angular.copy(objectOptions);
           scope.selection = ['guid1'];
           createDirective('<select multiple ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
         });
