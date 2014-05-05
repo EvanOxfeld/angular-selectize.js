@@ -25,7 +25,7 @@
 
   angular.module('selectize', [])
 
-  .directive('selectize', ['$parse', function($parse) {
+  .directive('selectize', ['$parse', '$timeout', function($parse, $timeout) {
     var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
 
     return {
@@ -39,45 +39,75 @@
         var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP);
         var valueName = match[4] || match[6];
         var optionsProperty = match[7];
+        var displayFn = $parse(match[2] || match[1]);
         var valueFn = $parse(match[2] ? match[1] : valueName);
-        var selectize;
+        var selectize, newSelections, newOptions, updateTimer;
 
-        scope.$parent.$watch(function() {
+        scope.$watchCollection(function() {
           return ngModelCtrl.$modelValue;
-        }, function(newValues, oldValues) {
-          if (selectize && !angular.equals(newValues, oldValues) && !modelMatchesView()) {
-            refreshSelectize();
+        }, function(modelValue) {
+          if (!selectize) {
+            return;
+          }
+          if (!newSelections) {
+            newSelections = getSelectedItems(modelValue);
+          }
+          if (!updateTimer) {
+            scheduleUpdate();
           }
         });
 
-        function modelMatchesView() {
-          var model = ngModelCtrl.$modelValue;
-          model = model && !angular.isArray(model) ? [model] : model || [];
-          var view = selectize.items.map(function(item) {
-            return getOptionValue(scope.$parent[optionsProperty][item]);
+        scope.$parent.$watchCollection(optionsProperty, function(options) {
+          if (!selectize) {
+            return initSelectize();
+          }
+          newOptions = newOptions ? newOptions: options;
+          if (!updateTimer) {
+            scheduleUpdate();
+          }
+        });
+
+        function scheduleUpdate() {
+          updateTimer = $timeout(function() {
+            var selected = newSelections || selectize.items;
+            selectize.clear();
+            if (newOptions) {
+              selectize.clearOptions();
+              selectize.load(function(cb) {
+                cb(newOptions.map(function(option, index) {
+                  return {
+                    text: getOptionLabel(option),
+                    value: index
+                  };
+                }));
+              });
+            }
+            selected.forEach(function(item) {
+              selectize.addItem(item);
+            });
+            newSelections = null;
+            newOptions = null;
+            updateTimer = null;
           });
-          return angular.equals(model, view);
         }
 
-        scope.$parent.$watchCollection(optionsProperty, refreshSelectize);
-
-        function refreshSelectize(newOptions, oldOptions) {
-          if (selectize) {
-            selectize.destroy();
-          }
+        function initSelectize() {
           scope.$evalAsync(function() {
-            $(element).selectize(opts);
-            selectize = $(element)[0].selectize;
+            element.selectize(opts);
+            selectize = element[0].selectize;
             if (scope.multiple) {
               selectize.on('item_add', function(value, $item) {
                 var model = ngModelCtrl.$viewValue;
                 var option = scope.$parent[optionsProperty][value];
                 value = option ? getOptionValue(option) : value;
 
-                model.push(value);
-                scope.$evalAsync(function() {
-                  ngModelCtrl.$setViewValue(model);
-                });
+                if (model.indexOf(value) === -1) {
+                  model.push(value);
+                  scope.$parent[optionsProperty].push(value);
+                  scope.$evalAsync(function() {
+                    ngModelCtrl.$setViewValue(model);
+                  });
+                }
               });
               selectize.on('item_remove', function(value) {
                 var model = ngModelCtrl.$viewValue;
@@ -96,11 +126,38 @@
           });
         }
 
+        function getSelectedItems(model) {
+            model = typeof model === 'string' ? [model] : model || [];
+            var selections = scope.$parent[optionsProperty].reduce(function(selected, option, index) {
+              var optionValue = getOptionValue(option);
+              if (model.indexOf(optionValue) >= 0) {
+                selected[optionValue] = index;
+              }
+              return selected;
+            }, {});
+            return Object.keys(selections)
+                      .map(function(key) {
+                        return selections[key];
+                      });
+        }
+
         function getOptionValue(option) {
           var optionContext = {};
           optionContext[valueName] = option;
           return valueFn(optionContext);
         }
+
+        function getOptionLabel(option) {
+          var optionContext = {};
+          optionContext[valueName] = option;
+          return displayFn(optionContext);
+        }
+
+        scope.$on('$destroy', function() {
+          if (updateTimer) {
+            $timeout.cancel(updateTimer);
+          }
+        });
       }
     };
   }]);

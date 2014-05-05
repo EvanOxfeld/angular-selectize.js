@@ -3,7 +3,7 @@
 describe('<select multiple selectize>', function() {
   beforeEach(module('selectize'));
 
-  var selectElement, selectize, scope, compile;
+  var selectElement, selectize, scope, compile, timeout;
 
   var stringOptions = ['foo', 'bar', 'baz'];
   var objectOptions = [{
@@ -17,9 +17,10 @@ describe('<select multiple selectize>', function() {
     text: 'third'
   }];
 
-  beforeEach(inject(function ($rootScope, $compile) {
+  beforeEach(inject(function ($rootScope, $compile, $timeout) {
     scope = $rootScope.$new();
     compile = $compile;
+    timeout = $timeout;
   }));
 
   afterEach(function() {
@@ -108,6 +109,10 @@ describe('<select multiple selectize>', function() {
             selectize.removeItem('foobar');
             assert.deepEqual(scope.selection, ['foo']);
           });
+
+          it('should update the options on scope', function() {
+            assert.deepEqual(scope.options, ['foo', 'bar', 'baz', 'foobar']);
+          })
         });
 
         describe('when a selected option is unselected', function() {
@@ -129,18 +134,21 @@ describe('<select multiple selectize>', function() {
           it('should clear the selection when the model is empty', function() {
             scope.selection = [];
             scope.$apply();
+            timeout.flush();
             assert.strictEqual(selectElement.find('option').length, 0);
           });
 
           it('should update the selection when the model contains a single item', function() {
             scope.selection = ['bar'];
             scope.$apply();
+            timeout.flush();
             testSelectedOptions(1);
           });
 
           it('should update the selection when the model contains two items', function() {
             scope.selection = ['bar', 'baz'];
             scope.$apply();
+            timeout.flush();
             testSelectedOptions([1,2]);
           });
         });
@@ -150,9 +158,29 @@ describe('<select multiple selectize>', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
             scope.options.push('qux');
             scope.$apply();
-            selectize = $(selectElement)[0].selectize;
-            selectize.refreshOptions();
+            timeout.flush();
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+          });
+        });
+
+        describe('when both the model and the options are updated', function() {
+          it('should have the same number of options in the dropdown menu as scope.options', function() {
+            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+
+            scope.selection = ['bar', 'baz'];
+            scope.options.push('qux');
+            scope.$apply();
+            timeout.flush();
+
+            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+          });
+
+          it('should update the selection', function() {
+            scope.selection = ['bar', 'baz'];
+            scope.options.push('qux');
+            scope.$apply();
+            timeout.flush();
+            testSelectedOptions([1,2]);
           });
         });
       });
@@ -227,18 +255,21 @@ describe('<select multiple selectize>', function() {
           it('should clear the selection when the model is empty', function() {
             scope.selection = [];
             scope.$apply();
+            timeout.flush();
             assert.strictEqual(selectElement.find('option').length, 0);
           });
 
           it('should update the selection when the model contains a single item', function() {
             scope.selection = ['guid2'];
             scope.$apply();
+            timeout.flush();
             testSelectedOptions(1);
           });
 
           it('should update the selection when the model contains two items', function() {
             scope.selection = ['guid2', 'guid3'];
             scope.$apply();
+            timeout.flush();
             testSelectedOptions([1,2]);
           });
         });
@@ -251,8 +282,7 @@ describe('<select multiple selectize>', function() {
               text: 'fourth'
             });
             scope.$apply();
-            selectize = $(selectElement)[0].selectize;
-            selectize.refreshOptions();
+            timeout.flush();
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
           });
         });

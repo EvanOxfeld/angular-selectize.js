@@ -3,7 +3,7 @@
 describe('<select selectize>', function() {
   beforeEach(module('selectize'));
 
-  var selectElement, selectize, scope, compile;
+  var selectElement, selectize, scope, compile, timeout;
 
   var stringOptions = ['foo', 'bar', 'baz'];
   var objectOptions = [{
@@ -17,9 +17,10 @@ describe('<select selectize>', function() {
     text: 'third'
   }];
 
-  beforeEach(inject(function ($rootScope, $compile) {
+  beforeEach(inject(function ($rootScope, $compile, $timeout) {
     scope = $rootScope.$new();
     compile = $compile;
+    timeout = $timeout;
   }));
 
   afterEach(function() {
@@ -79,10 +80,11 @@ describe('<select selectize>', function() {
 
     describe('when the model is updated', function() {
       it('should update the selection', function() {
-          testSelectedOption('foo');
-          scope.selection = 'bar';
-          scope.$apply();
-          testSelectedOption('bar');
+        testSelectedOption('foo');
+        scope.selection = 'bar';
+        scope.$apply();
+        timeout.flush();
+        testSelectedOption('bar');
       });
     });
 
@@ -91,9 +93,40 @@ describe('<select selectize>', function() {
         assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
         scope.options.push('qux');
         scope.$apply();
-        selectize = $(selectElement)[0].selectize;
-        selectize.refreshOptions();
+        timeout.flush();
         assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+      });
+
+      it('should not update the selection', function() {
+        testSelectedOption('foo');
+        scope.options.push('qux');
+        scope.$apply();
+        timeout.flush();
+        testSelectedOption('foo');
+      });
+    });
+
+    describe('when both the model and the options are updated', function() {
+      it('should have the same number of options in the dropdown menu as scope.options', function() {
+        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+        scope.selection = 'bar';
+        scope.options.push('qux');
+        scope.$apply();
+        timeout.flush();
+
+        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+      });
+
+      it('should update the selection', function() {
+        testSelectedOption('foo');
+
+        scope.selection = 'bar';
+        scope.options.push('qux');
+        scope.$apply();
+        timeout.flush();
+
+        testSelectedOption('bar');
       });
     });
   });
@@ -134,6 +167,7 @@ describe('<select selectize>', function() {
           testSelectedOption(scope.selection);
           scope.selection = 'guid3';
           scope.$apply();
+          timeout.flush();
           testSelectedOption(scope.selection);
       });
     });
@@ -146,9 +180,35 @@ describe('<select selectize>', function() {
           text: 'fourth'
         });
         scope.$apply();
-        selectize = $(selectElement)[0].selectize;
-        selectize.refreshOptions();
+        timeout.flush();
         assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+      });
+    });
+
+    describe('when both the model and the options are updated', function() {
+      it('should have the same number of options in the dropdown menu as scope.options', function() {
+        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+        scope.selection = 'bar';
+        scope.options.push({
+          value: 4,
+          text: 'fourth'
+        });
+        scope.$apply();
+        timeout.flush();
+
+        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+      });
+
+      it('should update the selection', function() {
+        testSelectedOption(scope.selection);
+
+        scope.selection = 'guid3';
+        scope.options.push('qux');
+        scope.$apply();
+        timeout.flush();
+
+        testSelectedOption(scope.selection);
       });
     });
   });
