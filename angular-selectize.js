@@ -41,7 +41,7 @@
         var optionsProperty = match[7];
         var displayFn = $parse(match[2] || match[1]);
         var valueFn = $parse(match[2] ? match[1] : valueName);
-        var selectize, newSelections, newOptions, updateTimer;
+        var selectize, newModelValue, newOptions, updateTimer;
 
         scope.$watchCollection(function() {
           return ngModelCtrl.$modelValue;
@@ -49,8 +49,8 @@
           if (!selectize) {
             return;
           }
-          if (!newSelections) {
-            newSelections = getSelectedItems(modelValue);
+          if (!newModelValue) {
+            newModelValue = modelValue;
           }
           if (!updateTimer) {
             scheduleUpdate();
@@ -69,7 +69,7 @@
 
         function scheduleUpdate() {
           updateTimer = $timeout(function() {
-            var selected = newSelections || selectize.items;
+            var selected = newModelValue ? getSelectedItems(newModelValue) : selectize.items;
             selectize.clear();
             if (newOptions) {
               selectize.clearOptions();
@@ -85,7 +85,7 @@
             selected.forEach(function(item) {
               selectize.addItem(item);
             });
-            newSelections = null;
+            newModelValue = null;
             newOptions = null;
             updateTimer = null;
           });

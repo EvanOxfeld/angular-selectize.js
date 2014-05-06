@@ -40,7 +40,7 @@ describe('<select selectize>', function() {
 
   function testSelectedOption(value) {
     var domOptions = selectElement.find('option');
-    var selectedOption = scope.options[parseInt(domOptions.attr('value'), 10)];
+    var selectedOption = scope.options[parseInt(domOptions.attr('value'), 10)] || '';
     assert.strictEqual(domOptions.length, 1);
     assert.ok(domOptions.attr('selected'));
     assert.equal(selectedOption.value || selectedOption, value);
@@ -107,26 +107,50 @@ describe('<select selectize>', function() {
     });
 
     describe('when both the model and the options are updated', function() {
-      it('should have the same number of options in the dropdown menu as scope.options', function() {
-        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+      describe('when both the model and options start empty', function() {
+        beforeEach(function() {
+          scope.selection = undefined;
+          scope.options = [];
+          scope.$apply();
+          timeout.flush();
+        });
 
-        scope.selection = 'bar';
-        scope.options.push('qux');
-        scope.$apply();
-        timeout.flush();
+        it('should update the selection', function() {
+          testSelectedOption('');
 
-        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+          scope.selection = 'foo';
+          scope.$apply();
+          scope.options = ['foo', 'bar', 'baz'];
+          scope.$apply();
+          timeout.flush();
+
+          testSelectedOption('foo');
+        });
+
       });
 
-      it('should update the selection', function() {
-        testSelectedOption('foo');
+      describe('when both the model and options start non-empty', function() {
+        it('should have the same number of options in the dropdown menu as scope.options', function() {
+          assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
 
-        scope.selection = 'bar';
-        scope.options.push('qux');
-        scope.$apply();
-        timeout.flush();
+          scope.selection = 'bar';
+          scope.options.push('qux');
+          scope.$apply();
+          timeout.flush();
 
-        testSelectedOption('bar');
+          assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+        });
+
+        it('should update the selection', function() {
+          testSelectedOption('foo');
+
+          scope.selection = 'bar';
+          scope.options.push('qux');
+          scope.$apply();
+          timeout.flush();
+
+          testSelectedOption('bar');
+        });
       });
     });
   });
