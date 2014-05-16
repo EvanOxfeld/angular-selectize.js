@@ -103,7 +103,9 @@
 
                 if (model.indexOf(value) === -1) {
                   model.push(value);
-                  scope.$parent[optionsProperty].push(value);
+                  if (!option) {
+                    scope.$parent[optionsProperty].push(value);
+                  }
                   scope.$evalAsync(function() {
                     ngModelCtrl.$setViewValue(model);
                   });

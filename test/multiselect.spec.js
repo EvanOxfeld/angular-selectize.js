@@ -87,6 +87,22 @@ describe('<select multiple selectize>', function() {
             mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
             assert.deepEqual(scope.selection, ['foo', 'baz']);
           });
+
+	  it('should have the correct remaining options', function() {
+            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+            selectize.open();
+            mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
+            timeout.flush();
+            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+	  });
+
+          it('should not change the options on scope', function() {
+            var options = angular.copy(scope.options);
+            selectize.open();
+            mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
+            timeout.flush();
+            assert.deepEqual(scope.options, options);
+          });
         });
 
         describe('when a new option is added', function() {
@@ -212,6 +228,22 @@ describe('<select multiple selectize>', function() {
             selectize.open();
             mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
             assert.deepEqual(scope.selection, ['guid1', 'guid3']);
+          });
+
+	  it('should have the correct remaining options', function() {
+            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+            selectize.open();
+            mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
+            timeout.flush();
+            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+	  });
+
+          it('should not change the options on scope', function() {
+            var options = angular.copy(scope.options);
+            selectize.open();
+            mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
+            timeout.flush();
+            assert.deepEqual(scope.options, options);
           });
         });
 
