@@ -25,6 +25,21 @@ In theory supports the same options with the `selectize` attribute as selectize.
 $ bower install angular-selectize.js
 ```
 
+## Testing
+
+Install angular-selectize.js dependencies via Bower and dev dependencies via npm:
+
+```bash
+$ bower install
+$ npm install
+```
+
+Run tests via [Karma](http://karma-runner.github.io) using the PhantomJS runner:
+
+```bash
+$ npm test
+```
+
 ## License
 
 The MIT License (MIT)
