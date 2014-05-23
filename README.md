@@ -1,5 +1,4 @@
-angular-selectize.js
-====================
+# angular-selectize.js [![build status](https://secure.travis-ci.org/EvanOxfeld/angular-selectize.js.png)](http://travis-ci.org/EvanOxfeld/angular-selectize.js)
 
 Angular directive that wraps the [Selectize](http://brianreavis.github.io/selectize.js/)
 hybrid textbox + &lt;select> box library by Brian Reavis.
