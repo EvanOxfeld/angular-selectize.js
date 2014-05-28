@@ -1,7 +1,7 @@
 {
   "name": "angular-selectize.js",
   "main": "angular-selectize.js",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "authors": [
     "Evan Oxfeld <eoxfeld@gmail.com>"
   ],
