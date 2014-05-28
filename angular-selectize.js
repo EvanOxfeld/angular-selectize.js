@@ -129,7 +129,7 @@
         }
 
         function getSelectedItems(model) {
-          model = typeof model === 'string' ? [model] : model || [];
+          model = angular.isArray(model) ? model : [model] || [];
           var selections = scope.$parent[optionsProperty].reduce(function(selected, option, index) {
             var optionValue = getOptionValue(option);
             if (model.indexOf(optionValue) >= 0) {
