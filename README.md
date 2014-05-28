@@ -19,6 +19,10 @@ Supports and two-way binds to an ngOptions expression. Tested with `label for va
 
 In theory supports the same options with the `selectize` attribute as selectize.js.
 
+## Demo
+
+View and edit the [angular-selectize.js demo plunker](http://plnkr.co/edit/4BuWxF).
+
 ## Installation
 
 ```bash
