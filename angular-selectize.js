@@ -129,18 +129,19 @@
         }
 
         function getSelectedItems(model) {
-            model = typeof model === 'string' ? [model] : model || [];
-            var selections = scope.$parent[optionsProperty].reduce(function(selected, option, index) {
-              var optionValue = getOptionValue(option);
-              if (model.indexOf(optionValue) >= 0) {
-                selected[optionValue] = index;
-              }
-              return selected;
-            }, {});
-            return Object.keys(selections)
-                      .map(function(key) {
-                        return selections[key];
-                      });
+          model = typeof model === 'string' ? [model] : model || [];
+          var selections = scope.$parent[optionsProperty].reduce(function(selected, option, index) {
+            var optionValue = getOptionValue(option);
+            if (model.indexOf(optionValue) >= 0) {
+              selected[optionValue] = index;
+            }
+            return selected;
+          }, {});
+          return Object
+                    .keys(selections)
+                    .map(function(key) {
+                      return selections[key];
+                    });
         }
 
         function getOptionValue(option) {
