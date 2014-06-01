@@ -40,7 +40,8 @@ describe('<select selectize>', function() {
 
   function testSelectedOption(value) {
     var domOptions = selectElement.find('option');
-    var selectedOption = scope.options[parseInt(domOptions.attr('value'), 10)] || '';
+    var index = parseInt(domOptions.attr('value'), 10);
+    var selectedOption = index >= 0 ? scope.options[index] || '' : '';
     assert.strictEqual(domOptions.length, 1);
     assert.ok(domOptions.attr('selected'));
     assert.equal(selectedOption.value || selectedOption, value);
@@ -156,83 +157,106 @@ describe('<select selectize>', function() {
   });
 
   describe('with an object array of options', function() {
-    beforeEach(function() {
-      scope.options = angular.copy(objectOptions);
-      scope.selection = 'guid1';
-      createDirective('<select ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
-
-    });
-
-    describe('when created', function() {
-      it('should convert a "<select>" into a selectize dropdown', function() {
-        assert.ok(selectize.$wrapper.hasClass('selectize-control'));
+    describe('undefined on scope', function() {
+      beforeEach(function() {
+        createDirective('<select ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
       });
 
-      it('should have the same number of options in the dropdown menu as scope.options', function() {
-        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+      describe('when created', function() {
+        it('should contain an unknown selection', function() {
+          testSelectedOption('');
+        });
       });
 
-      it('should default to the ng-model value', function() {
-        testSelectedOption(scope.selection);
-      });
-    });
-
-    describe('when an option is selected', function() {
-      it('should update the model', function() {
-        assert.strictEqual(scope.selection, 'guid1');
-        selectize.open();
-        mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
-        assert.strictEqual(scope.selection, 'guid3');
-      });
-    });
-
-    describe('when the model is updated', function() {
-      it('should update the selection', function() {
-          testSelectedOption(scope.selection);
-          scope.selection = 'guid3';
+      describe('when the model is updated', function() {
+        it('should contain an unknown selection', function() {
+          scope.selection = 'guid1';
           scope.$apply();
           timeout.flush();
+          testSelectedOption('');
+        });
+      });
+    });
+
+    describe('defined on scope', function() {
+      beforeEach(function() {
+        scope.options = angular.copy(objectOptions);
+        scope.selection = 'guid1';
+        createDirective('<select ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
+
+      });
+
+      describe('when created', function() {
+        it('should convert a "<select>" into a selectize dropdown', function() {
+          assert.ok(selectize.$wrapper.hasClass('selectize-control'));
+        });
+
+        it('should have the same number of options in the dropdown menu as scope.options', function() {
+          assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+        });
+
+        it('should default to the ng-model value', function() {
           testSelectedOption(scope.selection);
-      });
-    });
-
-    describe('when the options are updated', function() {
-      it('should have the same number of options in the dropdown menu as scope.options', function() {
-        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
-        scope.options.push({
-          value: 4,
-          text: 'fourth'
         });
-        scope.$apply();
-        timeout.flush();
-        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
       });
-    });
 
-    describe('when both the model and the options are updated', function() {
-      it('should have the same number of options in the dropdown menu as scope.options', function() {
-        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
-
-        scope.selection = 'bar';
-        scope.options.push({
-          value: 4,
-          text: 'fourth'
+      describe('when an option is selected', function() {
+        it('should update the model', function() {
+          assert.strictEqual(scope.selection, 'guid1');
+          selectize.open();
+          mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
+          assert.strictEqual(scope.selection, 'guid3');
         });
-        scope.$apply();
-        timeout.flush();
-
-        assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
       });
 
-      it('should update the selection', function() {
-        testSelectedOption(scope.selection);
+      describe('when the model is updated', function() {
+        it('should update the selection', function() {
+            testSelectedOption(scope.selection);
+            scope.selection = 'guid3';
+            scope.$apply();
+            timeout.flush();
+            testSelectedOption(scope.selection);
+        });
+      });
 
-        scope.selection = 'guid3';
-        scope.options.push('qux');
-        scope.$apply();
-        timeout.flush();
+      describe('when the options are updated', function() {
+        it('should have the same number of options in the dropdown menu as scope.options', function() {
+          assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+          scope.options.push({
+            value: 4,
+            text: 'fourth'
+          });
+          scope.$apply();
+          timeout.flush();
+          assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+        });
+      });
 
-        testSelectedOption(scope.selection);
+      describe('when both the model and the options are updated', function() {
+        it('should have the same number of options in the dropdown menu as scope.options', function() {
+          assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+          scope.selection = 'bar';
+          scope.options.push({
+            value: 4,
+            text: 'fourth'
+          });
+          scope.$apply();
+          timeout.flush();
+
+          assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+        });
+
+        it('should update the selection', function() {
+          testSelectedOption(scope.selection);
+
+          scope.selection = 'guid3';
+          scope.options.push('qux');
+          scope.$apply();
+          timeout.flush();
+
+          testSelectedOption(scope.selection);
+        });
       });
     });
   });

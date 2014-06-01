@@ -69,6 +69,12 @@
 
         function scheduleUpdate() {
           updateTimer = $timeout(function() {
+            var selectizeOptions = Object.keys(selectize.options);
+            var optionsIsEmpty = selectizeOptions.length === 0 || selectizeOptions.length === 1 && selectize.options['?'];
+            if (optionsIsEmpty && !newOptions) {
+              updateTimer = null;
+              return;
+            }
             var selected = newModelValue ? getSelectedItems(newModelValue) : selectize.items;
             selectize.clear();
             if (newOptions) {

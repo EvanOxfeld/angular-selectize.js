@@ -202,125 +202,162 @@ describe('<select multiple selectize>', function() {
       });
 
       describe('with an object array of options', function() {
-        beforeEach(function() {
-          scope.options = angular.copy(objectOptions);
-          scope.selection = ['guid1'];
-          createDirective('<select multiple ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
-        });
-
-        describe('when created', function() {
-          it('should convert a "<select>" into a selectize dropdown', function() {
-            assert.ok(selectize.$wrapper.hasClass('selectize-control'));
-          });
-
-          it('should have the correct remaining options', function() {
-            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
-          });
-
-          it('should default to the ng-model value', function() {
-            testSelectedOptions(0);
-          });
-        });
-
-        describe('when an option is selected', function() {
-          it('should update the model', function() {
-            assert.deepEqual(scope.selection, ['guid1']);
-            selectize.open();
-            mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
-            assert.deepEqual(scope.selection, ['guid1', 'guid3']);
-          });
-
-	  it('should have the correct remaining options', function() {
-            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
-            selectize.open();
-            mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
-            timeout.flush();
-            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
-	  });
-
-          it('should not change the options on scope', function() {
-            var options = angular.copy(scope.options);
-            selectize.open();
-            mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
-            timeout.flush();
-            assert.deepEqual(scope.options, options);
-          });
-        });
-
-        describe('when a new option is added', function() {
+        describe('undefined on scope', function() {
           beforeEach(function() {
-            assert.deepEqual(scope.selection, ['guid1']);
-            selectize.addOption({
-              text: 'fourth',
-              value: 'fourth'
+            createDirective('<select multiple ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
+          });
+
+          describe('when created', function() {
+            it('should not display any options', function() {
+              assert.equal(selectize.$dropdown_content.children().length, 0);
             });
-            selectize.addItem('fourth');
+
+            it('should not display a selection', function() {
+              assert.equal(selectElement.find('option').length, 0);
+            });
           });
 
-          it('should update the model', function() {
-            assert.deepEqual(scope.selection, ['guid1', 'fourth']);
-          });
+          describe('when the model is updated', function() {
+            beforeEach(function() {
+              scope.selection = ['guid1'];
+              scope.$apply();
+              timeout.flush();
+            });
 
-          it('should update the model when removed', function() {
-            assert.deepEqual(scope.selection, ['guid1', 'fourth']);
-            selectize.removeItem('fourth');
-            assert.deepEqual(scope.selection, ['guid1']);
-          });
-        });
+            it('should not display any options', function() {
+              assert.equal(selectize.$dropdown_content.children().length, 0);
+            });
 
-        describe('when a selected option is unselected', function() {
-          it('should update the model', function() {
-            selectize.addItem(1);
-            selectize.addItem(2);
-            assert.deepEqual(scope.selection, ['guid1','guid2','guid3']);
-
-            selectize.removeItem(0);
-            assert.deepEqual(scope.selection, ['guid2','guid3']);
+            it('should not display a selection', function() {
+              assert.equal(selectElement.find('option').length, 0);
+            });
           });
         });
 
-        describe('when the model is updated', function() {
+        describe('defined on scope', function() {
           beforeEach(function() {
-            testSelectedOptions(0);
+            scope.options = angular.copy(objectOptions);
+            scope.selection = ['guid1'];
+            createDirective('<select multiple ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
           });
 
-          it('should clear the selection when the model is empty', function() {
-            scope.selection = [];
-            scope.$apply();
-            timeout.flush();
-            assert.strictEqual(selectElement.find('option').length, 0);
-          });
-
-          it('should update the selection when the model contains a single item', function() {
-            scope.selection = ['guid2'];
-            scope.$apply();
-            timeout.flush();
-            testSelectedOptions(1);
-          });
-
-          it('should update the selection when the model contains two items', function() {
-            scope.selection = ['guid2', 'guid3'];
-            scope.$apply();
-            timeout.flush();
-            testSelectedOptions([1,2]);
-          });
-        });
-
-        describe('when the options are updated', function() {
-          it('should have the same number of options in the dropdown menu as scope.options', function() {
-            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
-            scope.options.push({
-              value: 'guid4',
-              text: 'fourth'
+          describe('when created', function() {
+            it('should convert a "<select>" into a selectize dropdown', function() {
+              assert.ok(selectize.$wrapper.hasClass('selectize-control'));
             });
-            scope.$apply();
-            timeout.flush();
-            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+
+            it('should have the correct remaining options', function() {
+              assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+            });
+
+            it('should default to the ng-model value', function() {
+              testSelectedOptions(0);
+            });
+          });
+
+          describe('when an option is selected', function() {
+            it('should update the model', function() {
+              assert.deepEqual(scope.selection, ['guid1']);
+              selectize.open();
+              mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
+              assert.deepEqual(scope.selection, ['guid1', 'guid3']);
+            });
+
+            it('should have the correct remaining options', function() {
+              assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+              selectize.open();
+              mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
+              timeout.flush();
+              assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+            });
+
+            it('should not change the options on scope', function() {
+              var options = angular.copy(scope.options);
+              selectize.open();
+              mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
+              timeout.flush();
+              assert.deepEqual(scope.options, options);
+            });
+          });
+
+          describe('when a new option is added', function() {
+            beforeEach(function() {
+              assert.deepEqual(scope.selection, ['guid1']);
+              selectize.addOption({
+                text: 'fourth',
+                value: 'fourth'
+              });
+              selectize.addItem('fourth');
+            });
+
+            it('should update the model', function() {
+              assert.deepEqual(scope.selection, ['guid1', 'fourth']);
+            });
+
+            it('should update the model when removed', function() {
+              assert.deepEqual(scope.selection, ['guid1', 'fourth']);
+              selectize.removeItem('fourth');
+              assert.deepEqual(scope.selection, ['guid1']);
+            });
+          });
+
+          describe('when a selected option is unselected', function() {
+            it('should update the model', function() {
+              selectize.addItem(1);
+              selectize.addItem(2);
+              assert.deepEqual(scope.selection, ['guid1','guid2','guid3']);
+
+              selectize.removeItem(0);
+              assert.deepEqual(scope.selection, ['guid2','guid3']);
+            });
+          });
+
+          describe('when the model is updated', function() {
+            beforeEach(function() {
+              testSelectedOptions(0);
+            });
+
+            it('should clear the selection when the model is empty', function() {
+              scope.selection = [];
+              scope.$apply();
+              timeout.flush();
+              assert.strictEqual(selectElement.find('option').length, 0);
+            });
+
+            it('should update the selection when the model contains a single item', function() {
+              scope.selection = ['guid2'];
+              scope.$apply();
+              timeout.flush();
+              testSelectedOptions(1);
+            });
+
+            it('should update the selection when the model contains two items', function() {
+              scope.selection = ['guid2', 'guid3'];
+              scope.$apply();
+              timeout.flush();
+              testSelectedOptions([1,2]);
+            });
+          });
+
+          describe('when the options are updated', function() {
+            it('should have the same number of options in the dropdown menu as scope.options', function() {
+              assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+              scope.options.push({
+                value: 'guid4',
+                text: 'fourth'
+              });
+              scope.$apply();
+              timeout.flush();
+              assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+            });
           });
         });
       });
 
       // describe('with two values in ng-model', function() {});
     });
+
+
+
   });
 });
