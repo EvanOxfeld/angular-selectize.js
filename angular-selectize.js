@@ -130,6 +130,22 @@
                   });
                 }
               });
+            } else {
+              selectize.on('item_add', function(value, $item) {
+                var model = ngModelCtrl.$viewValue;
+                var option = scope.$parent[optionsProperty][value];
+                value = option ? getOptionValue(option) : value;
+              
+                if (model !== value) {
+                  model = value;
+                  if (!option) {
+                    scope.$parent[optionsProperty].push(value);
+                  }
+                  scope.$evalAsync(function() {
+                    ngModelCtrl.$setViewValue(model);
+                  });
+                }
+              });
             }
           });
         }
