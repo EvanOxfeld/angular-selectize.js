@@ -46,11 +46,11 @@
         scope.$watchCollection(function() {
           return ngModelCtrl.$modelValue;
         }, function(modelValue) {
+          if (modelValue) {
+            newModelValue = modelValue;
+          }
           if (!selectize) {
             return;
-          }
-          if (!newModelValue) {
-            newModelValue = modelValue;
           }
           if (!updateTimer) {
             scheduleUpdate();
@@ -58,10 +58,12 @@
         });
 
         scope.$parent.$watchCollection(optionsProperty, function(options) {
+          if (options) {
+            newOptions = options;
+          }
           if (!selectize) {
             return initSelectize();
           }
-          newOptions = newOptions ? newOptions: options;
           if (!updateTimer) {
             scheduleUpdate();
           }
