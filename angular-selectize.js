@@ -49,9 +49,6 @@
           if (modelValue) {
             newModelValue = modelValue;
           }
-          if (!selectize) {
-            return;
-          }
           if (!updateTimer) {
             scheduleUpdate();
           }
@@ -61,15 +58,17 @@
           if (options) {
             newOptions = options;
           }
-          if (!selectize) {
-            return initSelectize();
-          }
           if (!updateTimer) {
             scheduleUpdate();
           }
         });
 
         function scheduleUpdate() {
+          if (!selectize) {
+            updateTimer = null;
+            return initSelectize();
+          }
+
           updateTimer = $timeout(function() {
             var selectizeOptions = Object.keys(selectize.options);
             var optionsIsEmpty = selectizeOptions.length === 0 || selectizeOptions.length === 1 && selectize.options['?'];
@@ -104,52 +103,60 @@
             element.selectize(opts);
             selectize = element[0].selectize;
             if (scope.multiple) {
-              selectize.on('item_add', function(value, $item) {
-                var model = ngModelCtrl.$viewValue;
-                var option = scope.$parent[optionsProperty][value];
-                value = option ? getOptionValue(option) : value;
-
-                if (model.indexOf(value) === -1) {
-                  model.push(value);
-                  if (!option) {
-                    scope.$parent[optionsProperty].push(value);
-                  }
-                  scope.$evalAsync(function() {
-                    ngModelCtrl.$setViewValue(model);
-                  });
-                }
-              });
-              selectize.on('item_remove', function(value) {
-                var model = ngModelCtrl.$viewValue;
-                var option = scope.$parent[optionsProperty][value];
-                value = option ? getOptionValue(option) : value;
-
-                var index = model.indexOf(value);
-                if (index >= 0) {
-                  model.splice(index, 1);
-                  scope.$evalAsync(function() {
-                    ngModelCtrl.$setViewValue(model);
-                  });
-                }
-              });
-            } else {
-              selectize.on('item_add', function(value, $item) {
-                var model = ngModelCtrl.$viewValue;
-                var option = scope.$parent[optionsProperty][value];
-                value = option ? getOptionValue(option) : value;
-              
-                if (model !== value) {
-                  model = value;
-                  if (!option) {
-                    scope.$parent[optionsProperty].push(value);
-                  }
-                  scope.$evalAsync(function() {
-                    ngModelCtrl.$setViewValue(model);
-                  });
-                }
-              });
+              selectize.on('item_add', onItemAddMultiSelect);
+              selectize.on('item_remove', onItemRemoveMultiSelect);
+            } else if (opts.create) {
+              selectize.on('item_add', onItemAddSingleSelect);
             }
           });
+        }
+
+        function onItemAddMultiSelect(value, $item) {
+          var model = ngModelCtrl.$viewValue;
+          var option = scope.$parent[optionsProperty][value];
+          value = option ? getOptionValue(option) : value;
+
+          if (model.indexOf(value) === -1) {
+            model.push(value);
+
+            if (!option) {
+              scope.$parent[optionsProperty].push(value);
+            }
+            scope.$evalAsync(function() {
+              ngModelCtrl.$setViewValue(model);
+            });
+          }
+        }
+
+        function onItemAddSingleSelect(value, $item) {
+          var model = ngModelCtrl.$viewValue;
+          var option = scope.$parent[optionsProperty][value];
+          value = option ? getOptionValue(option) : value;
+
+          if (model !== value) {
+            model = value;
+
+            if (!option && scope.$parent[optionsProperty].indexOf(value) === -1) {
+              scope.$parent[optionsProperty].push(value);
+            }
+            scope.$evalAsync(function() {
+              ngModelCtrl.$setViewValue(model);
+           });
+          }
+        }
+
+        function onItemRemoveMultiSelect(value) {
+          var model = ngModelCtrl.$viewValue;
+          var option = scope.$parent[optionsProperty][value];
+          value = option ? getOptionValue(option) : value;
+
+          var index = model.indexOf(value);
+          if (index >= 0) {
+            model.splice(index, 1);
+            scope.$evalAsync(function() {
+              ngModelCtrl.$setViewValue(model);
+            });
+          }
         }
 
         function getSelectedItems(model) {
