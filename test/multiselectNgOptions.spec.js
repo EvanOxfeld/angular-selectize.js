@@ -1,6 +1,6 @@
 'use strict';
 
-describe('<select multiple selectize>', function() {
+describe('<select multiple ng-options selectize>', function() {
   beforeEach(module('selectize'));
 
   var selectElement, selectize, scope, compile, timeout;
