@@ -36,36 +36,48 @@
       require: '?ngModel',
       link: function(scope, element, attrs, ngModelCtrl) {
         var opts = scope.$parent.$eval(scope.opts) || {};
+        var selectize, newModelValue, newOptions, updateTimer;
+
+        watchModel();
+
+        if (!attrs.ngOptions) {
+          return;
+        }
+
         var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP);
         var valueName = match[4] || match[6];
         var optionsProperty = match[7];
         var displayFn = $parse(match[2] || match[1]);
         var valueFn = $parse(match[2] ? match[1] : valueName);
-        var selectize, newModelValue, newOptions, updateTimer;
 
-        scope.$watchCollection(function() {
-          return ngModelCtrl.$modelValue;
-        }, function(modelValue) {
-          if (modelValue) {
-            newModelValue = modelValue;
-          }
-          if (!updateTimer) {
-            scheduleUpdate();
-          }
-        });
+        watchParentOptions();
 
-        scope.$parent.$watchCollection(optionsProperty, function(options) {
-          if (options) {
-            newOptions = options;
-          }
-          if (!updateTimer) {
-            scheduleUpdate();
-          }
-        });
+        function watchModel() {
+          scope.$watchCollection(function() {
+            return ngModelCtrl.$modelValue;
+          }, function(modelValue) {
+            if (modelValue) {
+              newModelValue = modelValue;
+            }
+            if (!updateTimer) {
+              scheduleUpdate();
+            }
+          });
+        }
+
+        function watchParentOptions() {
+          scope.$parent.$watchCollection(optionsProperty, function(options) {
+            if (options) {
+              newOptions = options;
+            }
+            if (!updateTimer) {
+              scheduleUpdate();
+            }
+          });
+        }
 
         function scheduleUpdate() {
           if (!selectize) {
-            updateTimer = null;
             return initSelectize();
           }
 
@@ -102,11 +114,13 @@
           scope.$evalAsync(function() {
             element.selectize(opts);
             selectize = element[0].selectize;
-            if (scope.multiple) {
-              selectize.on('item_add', onItemAddMultiSelect);
-              selectize.on('item_remove', onItemRemoveMultiSelect);
-            } else if (opts.create) {
-              selectize.on('item_add', onItemAddSingleSelect);
+            if (attrs.ngOptions) {
+              if (scope.multiple) {
+                selectize.on('item_add', onItemAddMultiSelect);
+                selectize.on('item_remove', onItemRemoveMultiSelect);
+              } else if (opts.create) {
+                selectize.on('item_add', onItemAddSingleSelect);
+              }
             }
           });
         }
@@ -161,6 +175,11 @@
 
         function getSelectedItems(model) {
           model = angular.isArray(model) ? model : [model] || [];
+
+          if (!attrs.ngOptions) {
+            return model.map(function(i) { return selectize.options[i].value });
+          }
+
           var selections = scope.$parent[optionsProperty].reduce(function(selected, option, index) {
             var optionValue = getOptionValue(option);
             if (model.indexOf(optionValue) >= 0) {
