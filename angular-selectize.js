@@ -104,8 +104,6 @@
             selected.forEach(function(item) {
               selectize.addItem(item);
             });
-            newModelValue = null;
-            newOptions = null;
             updateTimer = null;
           });
         }
