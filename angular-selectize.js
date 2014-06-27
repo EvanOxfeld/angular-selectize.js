@@ -56,9 +56,7 @@
           scope.$watchCollection(function() {
             return ngModelCtrl.$modelValue;
           }, function(modelValue) {
-            if (modelValue) {
-              newModelValue = modelValue;
-            }
+            newModelValue = modelValue;
             if (!updateTimer) {
               scheduleUpdate();
             }
@@ -67,9 +65,7 @@
 
         function watchParentOptions() {
           scope.$parent.$watchCollection(optionsProperty, function(options) {
-            if (options) {
-              newOptions = options;
-            }
+            newOptions = options;
             if (!updateTimer) {
               scheduleUpdate();
             }
