@@ -36,6 +36,7 @@
       require: '?ngModel',
       link: function(scope, element, attrs, ngModelCtrl) {
         var opts = scope.$parent.$eval(scope.opts) || {};
+        var initializing = false;
         var selectize, newModelValue, newOptions, updateTimer;
 
         watchModel();
@@ -73,7 +74,7 @@
         }
 
         function scheduleUpdate() {
-          if (!selectize) {
+          if (!selectize && !initializing) {
             return initSelectize();
           }
 
@@ -105,7 +106,9 @@
         }
 
         function initSelectize() {
+          initializing = true;
           scope.$evalAsync(function() {
+            initializing = false;
             element.selectize(opts);
             selectize = element[0].selectize;
             if (attrs.ngOptions) {
