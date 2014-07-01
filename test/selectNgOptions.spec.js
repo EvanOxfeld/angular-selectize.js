@@ -196,6 +196,7 @@ describe('<select ng-options selectize>', function() {
         scope.options = angular.copy(stringOptions);
         scope.$apply();
         timeout.flush();
+        selectize.refreshOptions();
       });
 
       it('should convert a "<select>" into a selectize dropdown', function() {
@@ -230,6 +231,24 @@ describe('<select ng-options selectize>', function() {
           scope.$apply();
           timeout.flush();
           testSelectedOption('');
+        });
+      });
+
+      describe('when both the model and options are loaded on scope', function() {
+        var modelChanges;
+        beforeEach(function() {
+          modelChanges = [];
+          scope.$watch('selection', function(selection) {
+            modelChanges.push(selection);
+          });
+          scope.selection = 'guid1';
+          scope.options = angular.copy(objectOptions);
+          scope.$apply();
+          timeout.flush();
+        });
+
+        it('should fire model watchers once', function() {
+          assert.strictEqual(modelChanges.length, 1);
         });
       });
     });

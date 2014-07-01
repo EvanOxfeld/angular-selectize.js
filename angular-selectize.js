@@ -37,6 +37,8 @@
       link: function(scope, element, attrs, ngModelCtrl) {
         var opts = scope.$parent.$eval(scope.opts) || {};
         var initializing = false;
+        var modelUpdate = false;
+        var optionsUpdate = false;
         var selectize, newModelValue, newOptions, updateTimer;
 
         watchModel();
@@ -58,6 +60,7 @@
             return ngModelCtrl.$modelValue;
           }, function(modelValue) {
             newModelValue = modelValue;
+            modelUpdate = true;
             if (!updateTimer) {
               scheduleUpdate();
             }
@@ -66,7 +69,8 @@
 
         function watchParentOptions() {
           scope.$parent.$watchCollection(optionsProperty, function(options) {
-            newOptions = options;
+            newOptions = options || [];
+            optionsUpdate = true;
             if (!updateTimer) {
               scheduleUpdate();
             }
@@ -78,22 +82,21 @@
             if (!initializing) {
               initSelectize();
             }
+            modelUpdate = optionsUpdate = false;
             return;
           }
 
           updateTimer = $timeout(function() {
+            var model = newModelValue;
+            var options = newOptions;
             var selectizeOptions = Object.keys(selectize.options);
-            var optionsIsEmpty = selectizeOptions.length === 0 || selectizeOptions.length === 1 && selectize.options['?'];
-            if (optionsIsEmpty && !newOptions) {
-              updateTimer = null;
-              return;
-            }
-            var selected = newModelValue ? getSelectedItems(newModelValue) : selectize.items;
-            selectize.clear();
-            if (newOptions) {
-              selectize.clearOptions();
+            var optionsIsEmpty = selectizeOptions.length === 0 || selectize.options['?'] && selectizeOptions.length === 1;
+            if (optionsUpdate) {
+              if (!optionsIsEmpty) {
+                selectize.clearOptions();
+              }
               selectize.load(function(cb) {
-                cb(newOptions.map(function(option, index) {
+                cb(options.map(function(option, index) {
                   return {
                     text: getOptionLabel(option),
                     value: index
@@ -101,9 +104,19 @@
                 }));
               });
             }
-            selected.forEach(function(item) {
-              selectize.addItem(item);
-            });
+
+            if (modelUpdate || optionsUpdate) {
+              if (scope.multiple) {
+                selectize.clear();
+              }
+              getSelectedItems(model).forEach(function(item) {
+                selectize.addItem(item);
+              });
+              //wait to remove ? to avoid a single select from briefly setting the model to null
+              selectize.removeOption('?');
+            }
+
+            modelUpdate = optionsUpdate = false;
             updateTimer = null;
           });
         }
@@ -178,6 +191,10 @@
 
           if (!attrs.ngOptions) {
             return model.map(function(i) { return selectize.options[i].value });
+          }
+
+          if (!scope.$parent[optionsProperty]) {
+            return [];
           }
 
           var selections = scope.$parent[optionsProperty].reduce(function(selected, option, index) {
