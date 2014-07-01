@@ -74,8 +74,11 @@
         }
 
         function scheduleUpdate() {
-          if (!selectize && !initializing) {
-            return initSelectize();
+          if (!selectize) {
+            if (!initializing) {
+              initSelectize();
+            }
+            return;
           }
 
           updateTimer = $timeout(function() {
