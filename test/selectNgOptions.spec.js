@@ -289,28 +289,21 @@ describe('<select ng-options selectize>', function() {
       });
 
       describe('when both the model and the options are updated', function() {
-        it('should have the same number of options in the dropdown menu as scope.options', function() {
-          assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
-
-          scope.selection = 'bar';
+        beforeEach(function() {
+          scope.selection = 'guid2';
           scope.options.push({
-            value: 4,
+            value: 'guid4',
             text: 'fourth'
           });
           scope.$apply();
           timeout.flush();
+        });
 
+        it('should have the same number of options in the dropdown menu as scope.options', function() {
           assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
         });
 
         it('should update the selection', function() {
-          testSelectedOption(scope.selection);
-
-          scope.selection = 'guid3';
-          scope.options.push('qux');
-          scope.$apply();
-          timeout.flush();
-
           testSelectedOption(scope.selection);
         });
       });
