@@ -362,12 +362,23 @@ describe('<select ng-options selectize>', function() {
         });
 
         describe('when the model is updated', function() {
-          it('should update the selection', function() {
-              testSelectedOption(scope.selection.value);
-              scope.selection = scope.options[2];
-              scope.$apply();
-              timeout.flush();
-              testSelectedOption(scope.selection.value);
+          it('a valid option should update the selection', function() {
+            testSelectedOption(scope.selection.value);
+            scope.selection = scope.options[2];
+            scope.$apply();
+            timeout.flush();
+            testSelectedOption(scope.selection.value);
+          });
+
+          it('a bogus option should clear the selection', function() {
+            testSelectedOption(scope.selection.value);
+            scope.selection = {
+              text: 'bogus',
+              value: 'a bogus value'
+            };
+            scope.$apply();
+            timeout.flush();
+            testSelectedOption('');
           });
         });
 

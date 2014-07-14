@@ -106,10 +106,13 @@
             }
 
             if (modelUpdate || optionsUpdate) {
-              if (scope.multiple) {
+              var selectedItems = getSelectedItems(model);
+              if (scope.multiple || selectedItems.length === 0) {
                 selectize.clear();
+                //clear can set the model to null
+                ngModelCtrl.$setViewValue(model);
               }
-              getSelectedItems(model).forEach(function(item) {
+              selectedItems.forEach(function(item) {
                 selectize.addItem(item);
               });
               //wait to remove ? to avoid a single select from briefly setting the model to null
