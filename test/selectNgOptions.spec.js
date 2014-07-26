@@ -45,6 +45,10 @@ describe('<select ng-options selectize>', function() {
     assert.strictEqual(domOptions.length, 1);
     assert.ok(domOptions.attr('selected'));
     assert.equal(selectedOption.value || selectedOption, value);
+
+    totesExpect(domOptions.length).isExactly(1);
+    totesExpect(domOptions.attr('selected')).isTruthy();
+    totesExpect(selectedOption.value || selectedOption).is(value);
   }
 
   describe('with a string array of options', function() {
@@ -62,10 +66,14 @@ describe('<select ng-options selectize>', function() {
         describe('when created', function() {
           it('should convert a "<select>" into a selectize dropdown', function() {
             assert.ok(selectize.$wrapper.hasClass('selectize-control'));
+
+	    totesExpect(selectize.$wrapper.hasClass('selectize-control')).isTruthy();
           });
 
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
           });
 
           it('should default to the ng-model value', function() {
@@ -79,6 +87,8 @@ describe('<select ng-options selectize>', function() {
             selectize.open();
             mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
             assert.strictEqual(scope.selection, 'baz');
+
+	    totesExpect(scope.selection).isExactly('baz');
           });
         });
 
@@ -95,10 +105,15 @@ describe('<select ng-options selectize>', function() {
         describe('when the options are updated', function() {
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
+
             scope.options.push('qux');
             scope.$apply();
             timeout.flush();
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
           });
 
           it('should not update the selection', function() {
@@ -137,12 +152,16 @@ describe('<select ng-options selectize>', function() {
             it('should have the same number of options in the dropdown menu as scope.options', function() {
               assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
 
+	      totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
+
               scope.selection = 'bar';
               scope.options.push('qux');
               scope.$apply();
               timeout.flush();
 
               assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	      totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
             });
 
             it('should update the selection', function() {
@@ -201,10 +220,14 @@ describe('<select ng-options selectize>', function() {
 
       it('should convert a "<select>" into a selectize dropdown', function() {
         assert.ok(selectize.$wrapper.hasClass('selectize-control'));
+
+	totesExpect(selectize.$wrapper.hasClass('selectize-control')).isTruthy();
       });
 
       it('should have the same number of options in the dropdown menu as scope.options', function() {
         assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
       });
 
       it('should default to the ng-model value', function() {
@@ -249,6 +272,8 @@ describe('<select ng-options selectize>', function() {
 
         it('should fire model watchers once', function() {
           assert.strictEqual(modelChanges.length, 1);
+
+	  totesExpect(modelChanges.length).isExactly(1);
         });
       });
     });
@@ -268,10 +293,14 @@ describe('<select ng-options selectize>', function() {
         describe('when created', function() {
           it('should convert a "<select>" into a selectize dropdown', function() {
             assert.ok(selectize.$wrapper.hasClass('selectize-control'));
+
+	    totesExpect(selectize.$wrapper.hasClass('selectize-control')).isTruthy();
           });
 
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
           });
 
           it('should default to the ng-model value', function() {
@@ -285,6 +314,8 @@ describe('<select ng-options selectize>', function() {
             selectize.open();
             mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
             assert.strictEqual(scope.selection, 'guid3');
+
+	    totesExpect(scope.selection).isExactly('guid3');
           });
         });
 
@@ -301,6 +332,8 @@ describe('<select ng-options selectize>', function() {
         describe('when the options are updated', function() {
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
             scope.options.push({
               value: 4,
               text: 'fourth'
@@ -308,6 +341,8 @@ describe('<select ng-options selectize>', function() {
             scope.$apply();
             timeout.flush();
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+	    
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
           });
         });
 
@@ -324,6 +359,8 @@ describe('<select ng-options selectize>', function() {
 
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
           });
 
           it('should update the selection', function() {
@@ -341,10 +378,14 @@ describe('<select ng-options selectize>', function() {
         describe('when created', function() {
           it('should convert a "<select>" into a selectize dropdown', function() {
             assert.ok(selectize.$wrapper.hasClass('selectize-control'));
+
+	    totesExpect(selectize.$wrapper.hasClass('selectize-control')).isTruthy();
           });
 
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
           });
 
           it('should default to the ng-model value', function() {
@@ -358,6 +399,8 @@ describe('<select ng-options selectize>', function() {
             selectize.open();
             mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
             assert.strictEqual(scope.selection.value, 'guid3');
+
+	    totesExpect(scope.selection.value).isExactly('guid3');
           });
         });
 
@@ -385,6 +428,8 @@ describe('<select ng-options selectize>', function() {
         describe('when the options are updated', function() {
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
             scope.options.push({
               value: 4,
               text: 'fourth'
@@ -392,6 +437,8 @@ describe('<select ng-options selectize>', function() {
             scope.$apply();
             timeout.flush();
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
           });
         });
 
@@ -408,6 +455,8 @@ describe('<select ng-options selectize>', function() {
 
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
+
+	    totesExpect(selectize.$dropdown_content.children().length).isExactly(scope.options.length);
           });
 
           it('should update the selection', function() {
