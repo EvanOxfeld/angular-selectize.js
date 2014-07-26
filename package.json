@@ -42,7 +42,7 @@
     "karma-mocha": "^0.1.3",
     "karma-phantomjs-launcher": "^0.1.4",
     "mocha": "^1.18.2",
-    "totes": "~0.0.8",
-    "karma-totes": "~0.0.4"
+    "totes": "~0.0.10",
+    "karma-totes": "~0.0.6"
   }
 }

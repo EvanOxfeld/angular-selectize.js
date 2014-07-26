@@ -36,6 +36,9 @@ describe('<select selectize>', function() {
     var selectedOption = index >= 0 ? stringOptions[index] || '' : '';
     assert.strictEqual(domOptions.length, 1);
     assert.equal(selectedOption.value || selectedOption, value);
+
+    totesExpect(domOptions.length).isExactly(1);
+    totesExpect(selectedOption.value || selectedOption).is(value);
   }
 
   describe('with options in the DOM', function() {
@@ -52,10 +55,14 @@ describe('<select selectize>', function() {
       describe('when created', function() {
         it('should convert a "<select>" into a selectize dropdown', function() {
           assert.ok(selectize.$wrapper.hasClass('selectize-control'));
+
+	  totesExpect(selectize.$wrapper.hasClass('selectize-control')).isTruthy();
         });
 
         it('should have the same number of options in the dropdown menu as DOM options', function() {
           assert.strictEqual(selectize.$dropdown_content.children().length, stringOptions.length);
+
+	  totesExpect(selectize.$dropdown_content.children().length).isExactly(stringOptions.length);
         });
 
         it('should default to the ng-model value', function() {
@@ -66,9 +73,12 @@ describe('<select selectize>', function() {
       describe('when an option is selected', function() {
         it('should update the model', function() {
           assert.strictEqual(scope.selection, '0');
+          totesExpect(scope.selection).isExactly('0');
+
           selectize.open();
           mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
           assert.strictEqual(scope.selection, '2');
+	  totesExpect(scope.selection).isExactly('2');
         });
       });
 
