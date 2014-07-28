@@ -56,6 +56,15 @@ describe('<select multiple ng-options selectize>', function() {
     }));
   }
 
+  function testFirstActiveOption() {
+    var activeOptions = selectize.$dropdown_content.children()
+                                                      .map(function() {
+                                                        return $(this).hasClass('active');
+                                                      })
+                                                      .toArray();
+    assert.ok(activeOptions[0] || !activeOptions.some(function(o) { return o; }));
+  }
+
   describe('with create mode enabled', function() {
     // describe('with an empty ng-model', function() {});
     describe('with a single value in ng-model', function() {
@@ -81,6 +90,10 @@ describe('<select multiple ng-options selectize>', function() {
 
             it('should default to the ng-model value', function() {
               testSelectedOptions(0);
+            });
+
+            it('should set the first option to active', function() {
+              testFirstActiveOption();
             });
           });
 
@@ -213,16 +226,32 @@ describe('<select multiple ng-options selectize>', function() {
             timeout.flush();
           });
 
-          it('should convert a "<select>" into a selectize dropdown', function() {
-            assert.ok(selectize.$wrapper.hasClass('selectize-control'));
+          describe('when created', function() {
+            it('should convert a "<select>" into a selectize dropdown', function() {
+              assert.ok(selectize.$wrapper.hasClass('selectize-control'));
+            });
+
+            it('should have the correct remaining options', function() {
+              assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+            });
+
+            it('should default to the ng-model value', function() {
+              testSelectedOptions(0);
+            });
+
+            it('should set the first option to active', function() {
+              testFirstActiveOption();
+            });
           });
 
-          it('should have the correct remaining options', function() {
-            assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
-          });
+          describe('when the model is updated', function() {
+            it('should set the first option to active', function() {
+              scope.selection = 'baz';
+              scope.$apply();
+              timeout.flush();
 
-          it('should default to the ng-model value', function() {
-            testSelectedOptions(0);
+              testFirstActiveOption();
+            });
           });
         });
       });

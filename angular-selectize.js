@@ -117,6 +117,9 @@
               });
               //wait to remove ? to avoid a single select from briefly setting the model to null
               selectize.removeOption('?');
+
+              var $option = selectize.getOption(0);
+              if ($option) selectize.setActiveOption($option);
             }
 
             modelUpdate = optionsUpdate = false;
