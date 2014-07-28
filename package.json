@@ -1,6 +1,6 @@
 {
   "name": "angular-selectize.js",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Angular Selectize directive for a hybrid textbox + <select> box. Supports ngOptions and two-way bindings.",
   "main": "angular-selectize.js",
   "directories": {
