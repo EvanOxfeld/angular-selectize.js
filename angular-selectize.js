@@ -43,6 +43,10 @@
 
         watchModel();
 
+        if (attrs.ngDisabled) {
+          watchParentNgDisabled();
+        }
+
         if (!attrs.ngOptions) {
           return;
         }
@@ -73,6 +77,14 @@
             optionsUpdate = true;
             if (!updateTimer) {
               scheduleUpdate();
+            }
+          });
+        }
+
+        function watchParentNgDisabled() {
+          scope.$parent.$watch(attrs.ngDisabled, function(isDisabled) {
+            if (selectize) {
+              isDisabled ? selectize.disable() : selectize.enable();
             }
           });
         }
