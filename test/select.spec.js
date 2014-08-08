@@ -72,6 +72,14 @@ describe('<select selectize>', function() {
         });
       });
 
+      describe('when a selection is removed', function(){
+        it('should clear the model', function(){
+          selectize.clear();
+          timeout.flush();
+          assert.strictEqual(scope.selection, '');
+	});
+      });
+
       describe('when the model is updated', function() {
         it('should update the selection', function() {
           testSelectedOption('foo');

@@ -208,7 +208,7 @@
           model = angular.isArray(model) ? model : [model] || [];
 
           if (!attrs.ngOptions) {
-            return model.map(function(i) { return selectize.options[i].value });
+            return model.map(function(i) { return selectize.options[i] ? selectize.options[i].value : ''});
           }
 
           if (!scope.$parent[optionsProperty]) {
