@@ -210,12 +210,14 @@
           if (!attrs.ngOptions) {
             return model.map(function(i) { return selectize.options[i] ? selectize.options[i].value : ''});
           }
-
-          if (!scope.$parent[optionsProperty]) {
+          
+          var options = scope.$parent.$eval(optionsProperty);
+          
+          if (!options) {
             return [];
           }
 
-          var selections = scope.$parent[optionsProperty].reduce(function(selected, option, index) {
+          var selections = options.reduce(function(selected, option, index) {
             var optionValue = getOptionValue(option);
             if (model.indexOf(optionValue) >= 0) {
               selected[optionValue] = index;
