@@ -216,6 +216,76 @@ describe('<select multiple ng-options selectize>', function() {
               testSelectedOptions([1,2]);
             });
           });
+
+          describe('with a ngOptions filter expression', function() {
+            beforeEach(function() {
+              createDirective('<select multiple ng-model="selection" ng-options="option for option in options | filter: search" selectize></select>');
+            });
+
+            describe('when the filter is undefined', function() {
+              it('should have the same number of options in the dropdown menu as scope.options', function() {
+                assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
+              });
+
+              it('should not update the selection', function() {
+                testSelectedOptions(0);
+              });
+            });
+
+            describe('when the filter matches the selection', function() {
+              beforeEach(function() {
+                scope.search = 'foo';
+                scope.$apply();
+                timeout.flush();
+              });
+
+              it('should have the number of options in the dropdown menu as the filtered scope.options', function() {
+                var filteredOptions = scope.$eval('options | filter: search');
+                assert.strictEqual(selectize.$dropdown_content.children().length, filteredOptions.length - scope.selection.length);
+              });
+
+              it('should not update the selection', function() {
+                testSelectedOptions(0);
+              });
+            });
+
+            describe('when the filter does not match the selection', function() {
+              beforeEach(function() {
+                scope.search = 'b';
+                scope.$apply();
+                timeout.flush();
+              });
+
+              it('should have the number of options in the dropdown menu as the filtered scope.options', function() {
+                var filteredOptions = scope.$eval('options | filter: search');
+                assert.strictEqual(selectize.$dropdown_content.children().length, filteredOptions.length);
+              });
+
+              it('should have an empty selection', function() {
+                testSelectedOptions([]);
+              });
+
+              it('should not update the model', function() {
+                assert.deepEqual(scope.selection, ['foo']);
+              });
+
+              describe('when an option is selected', function() {
+                beforeEach(function() {
+                  selectize.open();
+                  mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 0 + '"]'));
+                });
+
+                it('should update the model', function() {
+                  assert.deepEqual(scope.selection, ['foo', 'bar']);
+                });
+
+                it('should update the selectize control with only the filtered selections', function() {
+                  var selectionIndex = scope.$eval('options | filter : search').indexOf('bar');
+                  testSelectedOptions(selectionIndex);
+                });
+              });
+            });
+          });
         });
 
         describe('added to scope after initialization', function() {

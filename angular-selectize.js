@@ -27,6 +27,7 @@
 
   .directive('selectize', ['$parse', '$timeout', function($parse, $timeout) {
     var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
+    var OPTIONS_PROPERTY_REGEXP = /.*?(?=\s?\|)|.*\b/;
 
     return {
       scope: {
@@ -53,7 +54,8 @@
 
         var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP);
         var valueName = match[4] || match[6];
-        var optionsProperty = match[7];
+        var optionsExpression = match[7];
+        var optionsProperty = optionsExpression.match(OPTIONS_PROPERTY_REGEXP);
         var displayFn = $parse(match[2] || match[1]);
         var valueFn = $parse(match[2] ? match[1] : valueName);
 
@@ -72,7 +74,7 @@
         }
 
         function watchParentOptions() {
-          scope.$parent.$watchCollection(optionsProperty, function(options) {
+          scope.$parent.$watchCollection(optionsExpression, function(options) {
             newOptions = options || [];
             optionsUpdate = true;
             if (!updateTimer) {
@@ -158,13 +160,13 @@
 
         function onItemAddMultiSelect(value, $item) {
           var model = ngModelCtrl.$viewValue;
-          var option = scope.$parent[optionsProperty][value];
+          var option = scope.$parent.$eval(optionsExpression)[value];
           value = option ? getOptionValue(option) : value;
 
           if (model.indexOf(value) === -1) {
             model.push(value);
 
-            if (!option) {
+            if (!option && opts.create && scope.$parent[optionsProperty].indexOf(value) === -1) {
               scope.$parent[optionsProperty].push(value);
             }
             scope.$evalAsync(function() {
@@ -175,7 +177,7 @@
 
         function onItemAddSingleSelect(value, $item) {
           var model = ngModelCtrl.$viewValue;
-          var option = scope.$parent[optionsProperty][value];
+          var option = scope.$parent.$eval(optionsExpression)[value];
           value = option ? getOptionValue(option) : value;
 
           if (model !== value) {
@@ -192,7 +194,7 @@
 
         function onItemRemoveMultiSelect(value) {
           var model = ngModelCtrl.$viewValue;
-          var option = scope.$parent[optionsProperty][value];
+          var option = scope.$parent.$eval(optionsExpression)[value];
           value = option ? getOptionValue(option) : value;
 
           var index = model.indexOf(value);
@@ -211,11 +213,13 @@
             return model.map(function(i) { return selectize.options[i] ? selectize.options[i].value : ''});
           }
 
-          if (!scope.$parent[optionsProperty]) {
+          var options = scope.$parent.$eval(optionsExpression);
+
+          if (!options) {
             return [];
           }
 
-          var selections = scope.$parent[optionsProperty].reduce(function(selected, option, index) {
+          var selections = options.reduce(function(selected, option, index) {
             var optionValue = getOptionValue(option);
             if (model.indexOf(optionValue) >= 0) {
               selected[optionValue] = index;
