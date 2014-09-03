@@ -9,7 +9,7 @@ Add the `selectize` directive to a `<select>` tag like below:
    multiple
    ng-model="selection"
    ng-options="option.id as option.name for option in options"
-   selectize="{ plugins: ['remove_button'], render:'renderFnOnScope' }">
+   selectize="{ plugins: ['remove_button'], render: objectWithRenderFnPropertiesOnScope }">
 </select>
 ```
 
