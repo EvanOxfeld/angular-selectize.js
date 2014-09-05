@@ -6,15 +6,15 @@ describe('<select ng-options selectize>', function() {
   var selectElement, selectize, scope, compile, timeout;
 
   var stringOptions = ['foo', 'bar', 'baz'];
-  var objectOptions = [{
-    value: 'guid1',
-    text: 'first'
+  var colors = [{
+    hex: 'ff0000',
+    name: 'red'
   },{
-    value: 'guid2',
-    text: 'second'
+    hex: 'ffff00',
+    name: 'yellow'
   },{
-    value: 'guid3',
-    text: 'third'
+    hex: '0000ff',
+    name: 'blue'
   }];
 
   beforeEach(inject(function ($rootScope, $compile, $timeout) {
@@ -44,7 +44,7 @@ describe('<select ng-options selectize>', function() {
     var selectedOption = index >= 0 ? scope.$eval('options | filter: search')[index] || '' : '';
     assert.strictEqual(domOptions.length, 1);
     assert.ok(domOptions.attr('selected'));
-    assert.equal(selectedOption.value || selectedOption, value);
+    assert.equal(selectedOption.hex || selectedOption, value);
   }
 
   describe('with a string array of options', function() {
@@ -285,7 +285,7 @@ describe('<select ng-options selectize>', function() {
   describe('with an object array of options', function() {
     describe('undefined on scope', function() {
       beforeEach(function() {
-        createDirective('<select ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
+        createDirective('<select ng-model="selection" ng-options="color.hex as color.name for color in options" selectize></select>');
       });
 
       describe('when created', function() {
@@ -296,7 +296,7 @@ describe('<select ng-options selectize>', function() {
 
       describe('when the model is updated', function() {
         it('should contain an unknown selection', function() {
-          scope.selection = 'guid1';
+          scope.selection = 'ff0000';
           scope.$apply();
           timeout.flush();
           testSelectedOption('');
@@ -310,8 +310,8 @@ describe('<select ng-options selectize>', function() {
           scope.$watch('selection', function(selection) {
             modelChanges.push(selection);
           });
-          scope.selection = 'guid1';
-          scope.options = angular.copy(objectOptions);
+          scope.selection = 'ff0000';
+          scope.options = angular.copy(colors);
           scope.$apply();
           timeout.flush();
         });
@@ -324,14 +324,13 @@ describe('<select ng-options selectize>', function() {
 
     describe('defined on scope', function() {
       beforeEach(function() {
-        scope.options = angular.copy(objectOptions);
-
+        scope.options = angular.copy(colors);
       });
 
       describe('with a ngOptions select expression', function() {
         beforeEach(function() {
-          scope.selection = 'guid1';
-          createDirective('<select ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
+          scope.selection = 'ff0000';
+          createDirective('<select ng-model="selection" ng-options="color.hex as color.name for color in options" selectize></select>');
         });
 
         describe('when created', function() {
@@ -350,17 +349,17 @@ describe('<select ng-options selectize>', function() {
 
         describe('when an option is selected', function() {
           it('should update the model', function() {
-            assert.strictEqual(scope.selection, 'guid1');
+            assert.strictEqual(scope.selection, 'ff0000');
             selectize.open();
             mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
-            assert.strictEqual(scope.selection, 'guid3');
+            assert.strictEqual(scope.selection, '0000ff');
           });
         });
 
         describe('when the model is updated', function() {
           it('should update the selection', function() {
               testSelectedOption(scope.selection);
-              scope.selection = 'guid3';
+              scope.selection = '0000ff';
               scope.$apply();
               timeout.flush();
               testSelectedOption(scope.selection);
@@ -371,8 +370,8 @@ describe('<select ng-options selectize>', function() {
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
             scope.options.push({
-              value: 4,
-              text: 'fourth'
+              hex: '000000',
+              name: 'black'
             });
             scope.$apply();
             timeout.flush();
@@ -382,10 +381,10 @@ describe('<select ng-options selectize>', function() {
 
         describe('when both the model and the options are updated', function() {
           beforeEach(function() {
-            scope.selection = 'guid2';
+            scope.selection = 'ffff00';
             scope.options.push({
-              value: 'guid4',
-              text: 'fourth'
+              hex: '000000',
+              name: 'black'
             });
             scope.$apply();
             timeout.flush();
@@ -404,7 +403,7 @@ describe('<select ng-options selectize>', function() {
       describe('without a ngOptions select expression', function() {
         beforeEach(function() {
           scope.selection = scope.options[0];
-          createDirective('<select ng-model="selection" ng-options="option.text for option in options" selectize></select>');
+          createDirective('<select ng-model="selection" ng-options="color.name for color in options" selectize></select>');
         });
 
         describe('when created', function() {
@@ -417,33 +416,33 @@ describe('<select ng-options selectize>', function() {
           });
 
           it('should default to the ng-model value', function() {
-            testSelectedOption(scope.selection.value);
+            testSelectedOption(scope.selection.hex);
           });
         });
 
         describe('when an option is selected', function() {
           it('should update the model', function() {
-            assert.strictEqual(scope.selection.value, 'guid1');
+            assert.strictEqual(scope.selection.hex, 'ff0000');
             selectize.open();
             mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
-            assert.strictEqual(scope.selection.value, 'guid3');
+            assert.strictEqual(scope.selection.hex, '0000ff');
           });
         });
 
         describe('when the model is updated', function() {
           it('a valid option should update the selection', function() {
-            testSelectedOption(scope.selection.value);
+            testSelectedOption(scope.selection.hex);
             scope.selection = scope.options[2];
             scope.$apply();
             timeout.flush();
-            testSelectedOption(scope.selection.value);
+            testSelectedOption(scope.selection.hex);
           });
 
           it('a bogus option should clear the selection', function() {
-            testSelectedOption(scope.selection.value);
+            testSelectedOption(scope.selection.hex);
             scope.selection = {
-              text: 'bogus',
-              value: 'a bogus value'
+              name: 'bogus',
+              hex: 'a bogus value'
             };
             scope.$apply();
             timeout.flush();
@@ -455,8 +454,8 @@ describe('<select ng-options selectize>', function() {
           it('should have the same number of options in the dropdown menu as scope.options', function() {
             assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length);
             scope.options.push({
-              value: 4,
-              text: 'fourth'
+              hex: '000000',
+              name: 'black'
             });
             scope.$apply();
             timeout.flush();
@@ -468,8 +467,8 @@ describe('<select ng-options selectize>', function() {
           beforeEach(function() {
             scope.selection = scope.options[1];
             scope.options.push({
-              value: 'guid4',
-              text: 'fourth'
+              hex: '000000',
+              name: 'black'
             });
             scope.$apply();
             timeout.flush();
@@ -480,7 +479,7 @@ describe('<select ng-options selectize>', function() {
           });
 
           it('should update the selection', function() {
-            testSelectedOption(scope.selection.value);
+            testSelectedOption(scope.selection.hex);
           });
         });
       });

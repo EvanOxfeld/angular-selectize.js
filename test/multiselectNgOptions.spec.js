@@ -6,15 +6,15 @@ describe('<select multiple ng-options selectize>', function() {
   var selectElement, selectize, scope, compile, timeout;
 
   var stringOptions = ['foo', 'bar', 'baz'];
-  var objectOptions = [{
-    value: 'guid1',
-    text: 'first'
+  var colors = [{
+    hex: 'ff0000',
+    name: 'red'
   },{
-    value: 'guid2',
-    text: 'second'
+    hex: 'ffff00',
+    name: 'yellow'
   },{
-    value: 'guid3',
-    text: 'third'
+    hex: '0000ff',
+    name: 'blue'
   }];
 
   beforeEach(inject(function ($rootScope, $compile, $timeout) {
@@ -329,7 +329,7 @@ describe('<select multiple ng-options selectize>', function() {
       describe('with an object array of options', function() {
         describe('undefined on scope', function() {
           beforeEach(function() {
-            createDirective('<select multiple ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
+            createDirective('<select multiple ng-model="selection" ng-options="color.hex as color.name for color in options" selectize></select>');
           });
 
           describe('when created', function() {
@@ -344,7 +344,7 @@ describe('<select multiple ng-options selectize>', function() {
 
           describe('when the model is updated', function() {
             beforeEach(function() {
-              scope.selection = ['guid1'];
+              scope.selection = ['ff0000'];
               scope.$apply();
               timeout.flush();
             });
@@ -361,9 +361,9 @@ describe('<select multiple ng-options selectize>', function() {
 
         describe('defined on scope', function() {
           beforeEach(function() {
-            scope.options = angular.copy(objectOptions);
-            scope.selection = ['guid1'];
-            createDirective('<select multiple ng-model="selection" ng-options="option.value as option.text for option in options" selectize></select>');
+            scope.options = angular.copy(colors);
+            scope.selection = ['ff0000'];
+            createDirective('<select multiple ng-model="selection" ng-options="color.hex as color.name for color in options" selectize></select>');
           });
 
           describe('when created', function() {
@@ -382,10 +382,10 @@ describe('<select multiple ng-options selectize>', function() {
 
           describe('when an option is selected', function() {
             it('should update the model', function() {
-              assert.deepEqual(scope.selection, ['guid1']);
+              assert.deepEqual(scope.selection, ['ff0000']);
               selectize.open();
               mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
-              assert.deepEqual(scope.selection, ['guid1', 'guid3']);
+              assert.deepEqual(scope.selection, ['ff0000', '0000ff']);
             });
 
             it('should have the correct remaining options', function() {
@@ -407,22 +407,22 @@ describe('<select multiple ng-options selectize>', function() {
 
           describe('when a new option is added', function() {
             beforeEach(function() {
-              assert.deepEqual(scope.selection, ['guid1']);
+              assert.deepEqual(scope.selection, ['ff0000']);
               selectize.addOption({
-                text: 'fourth',
-                value: 'fourth'
+                text: 'black',
+                value: 'black'
               });
-              selectize.addItem('fourth');
+              selectize.addItem('black');
             });
 
             it('should update the model', function() {
-              assert.deepEqual(scope.selection, ['guid1', 'fourth']);
+              assert.deepEqual(scope.selection, ['ff0000', 'black']);
             });
 
             it('should update the model when removed', function() {
-              assert.deepEqual(scope.selection, ['guid1', 'fourth']);
-              selectize.removeItem('fourth');
-              assert.deepEqual(scope.selection, ['guid1']);
+              assert.deepEqual(scope.selection, ['ff0000', 'black']);
+              selectize.removeItem('black');
+              assert.deepEqual(scope.selection, ['ff0000']);
             });
           });
 
@@ -430,10 +430,10 @@ describe('<select multiple ng-options selectize>', function() {
             it('should update the model', function() {
               selectize.addItem(1);
               selectize.addItem(2);
-              assert.deepEqual(scope.selection, ['guid1','guid2','guid3']);
+              assert.deepEqual(scope.selection, ['ff0000','ffff00','0000ff']);
 
               selectize.removeItem(0);
-              assert.deepEqual(scope.selection, ['guid2','guid3']);
+              assert.deepEqual(scope.selection, ['ffff00','0000ff']);
             });
           });
 
@@ -450,14 +450,14 @@ describe('<select multiple ng-options selectize>', function() {
             });
 
             it('should update the selection when the model contains a single item', function() {
-              scope.selection = ['guid2'];
+              scope.selection = ['ffff00'];
               scope.$apply();
               timeout.flush();
               testSelectedOptions(1);
             });
 
             it('should update the selection when the model contains two items', function() {
-              scope.selection = ['guid2', 'guid3'];
+              scope.selection = ['ffff00', '0000ff'];
               scope.$apply();
               timeout.flush();
               testSelectedOptions([1,2]);
@@ -468,8 +468,8 @@ describe('<select multiple ng-options selectize>', function() {
             it('should have the same number of options in the dropdown menu as scope.options', function() {
               assert.strictEqual(selectize.$dropdown_content.children().length, scope.options.length - scope.selection.length);
               scope.options.push({
-                value: 'guid4',
-                text: 'fourth'
+                hex: '000000',
+                name: 'black'
               });
               scope.$apply();
               timeout.flush();
