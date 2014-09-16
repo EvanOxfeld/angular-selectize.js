@@ -229,32 +229,66 @@ describe('<select ng-options selectize>', function() {
       });
 
       describe('with create mode enabled', function() {
-        beforeEach(function() {
-          scope.options = angular.copy(stringOptions);
-          createDirective('<select ng-model="selection" ng-options="option for option in options" selectize="{ create:\'true\' }"></select>');
+        describe('with options as an array scope property', function() {
+          beforeEach(function() {
+            scope.options = angular.copy(stringOptions);
+            createDirective('<select ng-model="selection" ng-options="option for option in options" selectize="{ create:\'true\' }"></select>');
+          });
+
+          describe('when a new option is added', function() {
+            beforeEach(function() {
+              selectize.addOption({
+                text: 'foobar',
+                value: 'foobar'
+              });
+              selectize.addItem('foobar');
+            });
+
+            it('should update the model', function() {
+              assert.deepEqual(scope.selection, 'foobar');
+            });
+
+            it('should update the model when removed', function() {
+              selectize.removeItem('foobar');
+              assert.deepEqual(scope.selection, null);
+            });
+
+            it('should update the options on scope', function() {
+              assert.deepEqual(scope.options, ['foo', 'bar', 'baz', 'foobar']);
+            })
+          });
         });
 
-        describe('when a new option is added', function() {
+        describe('with options as a nested array scope property', function() {
           beforeEach(function() {
-            selectize.addOption({
-              text: 'foobar',
-              value: 'foobar'
+            scope.testData = {
+              options: angular.copy(stringOptions)
+            };
+            createDirective('<select ng-model="selection" ng-options="option for option in testData.options" selectize="{ create:\'true\' }"></select>');
+          });
+
+          describe('when a new option is added', function() {
+            beforeEach(function() {
+              selectize.addOption({
+                text: 'foobar',
+                value: 'foobar'
+              });
+              selectize.addItem('foobar');
             });
-            selectize.addItem('foobar');
-          });
 
-          it('should update the model', function() {
-            assert.deepEqual(scope.selection, 'foobar');
-          });
+            it('should update the model', function() {
+              assert.deepEqual(scope.selection, 'foobar');
+            });
 
-          it('should update the model when removed', function() {
-            selectize.removeItem('foobar');
-            assert.deepEqual(scope.selection, null);
-          });
+            it('should update the model when removed', function() {
+              selectize.removeItem('foobar');
+              assert.deepEqual(scope.selection, null);
+            });
 
-          it('should update the options on scope', function() {
-            assert.deepEqual(scope.options, ['foo', 'bar', 'baz', 'foobar']);
-          })
+            it('should update the options on scope', function() {
+              assert.deepEqual(scope.testData.options, ['foo', 'bar', 'baz', 'foobar']);
+            })
+          });
         });
       });
     });
