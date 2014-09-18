@@ -195,7 +195,8 @@
 
         function onItemRemoveMultiSelect(value) {
           var model = ngModelCtrl.$viewValue;
-          var option = scope.$parent.$eval(optionsExpression)[value];
+          var options = optionsFn(scope.$parent);
+          var option = options[value];
           value = option ? getOptionValue(option) : value;
 
           var index = model.indexOf(value);
@@ -214,7 +215,7 @@
             return model.map(function(i) { return selectize.options[i] ? selectize.options[i].value : ''});
           }
 
-          var options = scope.$parent.$eval(optionsExpression);
+          var options = optionsFn(scope.$parent);
 
           if (!options) {
             return [];
