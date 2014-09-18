@@ -27,7 +27,6 @@
 
   .directive('selectize', ['$parse', '$timeout', function($parse, $timeout) {
     var NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
-    var OPTIONS_PROPERTY_REGEXP = /.*?(?=\s?\|)|.*\b/;
 
     return {
       scope: {
@@ -55,7 +54,7 @@
         var match = attrs.ngOptions.match(NG_OPTIONS_REGEXP);
         var valueName = match[4] || match[6];
         var optionsExpression = match[7];
-        var optionsProperty = optionsExpression.match(OPTIONS_PROPERTY_REGEXP);
+        var optionsFn = $parse(optionsExpression);
         var displayFn = $parse(match[2] || match[1]);
         var valueFn = $parse(match[2] ? match[1] : valueName);
 
@@ -160,14 +159,15 @@
 
         function onItemAddMultiSelect(value, $item) {
           var model = ngModelCtrl.$viewValue;
-          var option = scope.$parent.$eval(optionsExpression)[value];
+          var options = optionsFn(scope.$parent);
+          var option = options[value];
           value = option ? getOptionValue(option) : value;
 
           if (model.indexOf(value) === -1) {
             model.push(value);
 
-            if (!option && opts.create && scope.$parent[optionsProperty].indexOf(value) === -1) {
-              scope.$parent[optionsProperty].push(value);
+            if (!option && opts.create && options.indexOf(value) === -1) {
+              options.push(value);
             }
             scope.$evalAsync(function() {
               ngModelCtrl.$setViewValue(model);
@@ -177,14 +177,15 @@
 
         function onItemAddSingleSelect(value, $item) {
           var model = ngModelCtrl.$viewValue;
-          var option = scope.$parent.$eval(optionsExpression)[value];
+          var options = optionsFn(scope.$parent);
+          var option = options[value];
           value = option ? getOptionValue(option) : value;
 
           if (model !== value) {
             model = value;
 
-            if (!option && scope.$parent[optionsProperty].indexOf(value) === -1) {
-              scope.$parent[optionsProperty].push(value);
+            if (!option && options.indexOf(value) === -1) {
+              options.push(value);
             }
             scope.$evalAsync(function() {
               ngModelCtrl.$setViewValue(model);
