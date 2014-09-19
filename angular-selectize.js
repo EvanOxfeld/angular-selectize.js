@@ -57,6 +57,7 @@
         var optionsFn = $parse(optionsExpression);
         var displayFn = $parse(match[2] || match[1]);
         var valueFn = $parse(match[2] ? match[1] : valueName);
+        var objectKey = match[5];
 
         watchParentOptions();
 
@@ -207,6 +208,15 @@
           }
         }
 
+        function arrayObjectIndexOf(arr, obj) {
+          for (var i = 0; i < arr.length; i++) {
+            if (angular.equals(arr[i], obj)) {
+              return i;
+            }
+          };
+          return -1;
+        }
+
         function getSelectedItems(model) {
           model = angular.isArray(model) ? model : [model] || [];
 
@@ -222,8 +232,14 @@
 
           var selections = options.reduce(function(selected, option, index) {
             var optionValue = getOptionValue(option);
-            if (model.indexOf(optionValue) >= 0) {
-              selected[optionValue] = index;
+            if (angular.isObject(optionValue)) {
+              if (arrayObjectIndexOf(model, optionValue) >= 0) {
+                selected[optionValue[objectKey]] = index;
+              }
+            } else {
+              if (model.indexOf(optionValue) >= 0) {
+                selected[optionValue] = index;
+              }
             }
             return selected;
           }, {});
