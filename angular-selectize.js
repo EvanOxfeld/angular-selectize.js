@@ -95,7 +95,6 @@
             if (!initializing) {
               initSelectize();
             }
-            modelUpdate = optionsUpdate = false;
             return;
           }
 
