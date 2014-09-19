@@ -184,6 +184,15 @@ describe('<select multiple ng-options selectize>', function() {
               timeout.flush();
               testSelectedOptions([1,2]);
             });
+
+            it('should update the model on the next selection when the model is null', function() {
+              scope.selection = null;
+              scope.$apply();
+              timeout.flush();
+              selectize.open();
+              mousedownClickMouseup(selectize.$dropdown_content.find('[data-value="' + 2 + '"]'));
+              assert.deepEqual(scope.selection, ['baz']);
+            });
           });
 
           describe('when the options are updated', function() {

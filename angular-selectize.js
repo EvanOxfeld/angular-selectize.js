@@ -158,7 +158,7 @@
         }
 
         function onItemAddMultiSelect(value, $item) {
-          var model = ngModelCtrl.$viewValue;
+          var model = ngModelCtrl.$viewValue || [];
           var options = optionsFn(scope.$parent);
           var option = options[value];
           value = option ? getOptionValue(option) : value;
