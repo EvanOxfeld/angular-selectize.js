@@ -250,6 +250,7 @@
           if (updateTimer) {
             $timeout.cancel(updateTimer);
           }
+          if ( selectize ) selectize.destroy();
         });
       }
     };
