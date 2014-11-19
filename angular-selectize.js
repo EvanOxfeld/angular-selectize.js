@@ -42,6 +42,7 @@
         var selectize, newModelValue, newOptions, updateTimer;
 
         watchModel();
+        subscribeToScopeDestroy();
 
         if (attrs.ngDisabled) {
           watchParentNgDisabled();
@@ -246,11 +247,14 @@
           return displayFn(optionContext);
         }
 
-        scope.$on('$destroy', function() {
-          if (updateTimer) {
-            $timeout.cancel(updateTimer);
-          }
-        });
+        function subscribeToScopeDestroy() {
+          scope.$on('$destroy', function () {
+            if (updateTimer) {
+              $timeout.cancel(updateTimer);
+            }
+            if (selectize) selectize.destroy();
+          });
+        }
       }
     };
   }]);
