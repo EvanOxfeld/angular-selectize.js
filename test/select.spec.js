@@ -54,6 +54,16 @@ describe('<select selectize>', function() {
           assert.ok(selectize.$wrapper.hasClass('selectize-control'));
         });
 
+        it('should copy the angular classes from the <select> into the selectize-input', function () {
+          var ngClasses = selectize.$wrapper.attr('classes').split(' ').filter(function (className) {
+            return className.match(/^ng\-/);
+          });
+
+          ngClasses.forEach(function (className) {
+            assert.ok(selectize.$control.hasClass(className));
+          });
+        });
+
         it('should have the same number of options in the dropdown menu as DOM options', function() {
           assert.strictEqual(selectize.$dropdown_content.children().length, stringOptions.length);
         });
@@ -87,6 +97,16 @@ describe('<select selectize>', function() {
           scope.$apply();
           timeout.flush();
           testSelectedOption('bar');
+        });
+
+        it('should the selectize-input angular classes', function () {
+          var ngClasses = selectize.$wrapper.attr('classes').split(' ').filter(function (className) {
+            return className.match(/^ng\-/);
+          });
+
+          ngClasses.forEach(function (className) {
+            assert.ok(selectize.$control.hasClass(className));
+          });
         });
       });
     });
