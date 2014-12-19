@@ -55,7 +55,7 @@ describe('<select selectize>', function() {
         });
 
         it('should copy the angular classes from the <select> into the selectize-input', function () {
-          var ngClasses = selectize.$wrapper.attr('classes').split(' ').filter(function (className) {
+          var ngClasses = selectize.$wrapper.attr('class').split(' ').filter(function (className) {
             return className.match(/^ng\-/);
           });
 
@@ -100,7 +100,7 @@ describe('<select selectize>', function() {
         });
 
         it('should the selectize-input angular classes', function () {
-          var ngClasses = selectize.$wrapper.attr('classes').split(' ').filter(function (className) {
+          var ngClasses = selectize.$wrapper.attr('class').split(' ').filter(function (className) {
             return className.match(/^ng\-/);
           });
 
