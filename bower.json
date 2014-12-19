@@ -30,10 +30,10 @@
   ],
   "dependencies": {
     "selectize": ">= 0.10.1 < 0.12.0",
-    "angular": "~1.2.5"
+    "angular": "<=1.2.25"
   },
   "devDependencies": {
-    "angular-mocks": "~1.2.5",
+    "angular-mocks": "<=1.2.25",
     "jquery": "^2.1.0"
   }
 }
