@@ -147,6 +147,7 @@
             initializing = false;
             element.selectize(opts);
             selectize = element[0].selectize;
+            syncInputClasses();
             if (attrs.ngOptions) {
               if (scope.multiple) {
                 selectize.on('item_add', onItemAddMultiSelect);
