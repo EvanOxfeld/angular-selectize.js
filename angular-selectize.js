@@ -130,6 +130,8 @@
               //wait to remove ? to avoid a single select from briefly setting the model to null
               selectize.removeOption('?');
 
+              syncInputClasses();
+
               var $option = selectize.getOption(0);
               if ($option) selectize.setActiveOption($option);
             }
@@ -154,6 +156,24 @@
               }
             }
           });
+        }
+
+        function syncInputClasses() {
+          var inputClasses = selectize.$input.attr('class').split(' ');
+          var controlClasses = selectize.$control.attr('class').split(' ');
+          var i;
+
+          for (i=0; i < controlClasses.length; i++) {
+            if (controlClasses[i].match(/^ng\-/)) {
+              selectize.$control.removeClass(controlClasses[i]);
+            }
+          }
+
+          for (i=0; i < inputClasses.length; i++) {
+            if (inputClasses[i].match(/^ng\-/)) {
+              selectize.$control.addClass(inputClasses[i]);
+            }
+          }
         }
 
         function onItemAddMultiSelect(value, $item) {
